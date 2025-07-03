@@ -1,12 +1,11 @@
 import { Chip, ChipProps } from "@mui/material";
-import { getStatusColor, getStatusLabel } from "../../utils/status";
 
 import React from "react";
-import { Status } from "../../types";
+import { getStatusColor } from "../../utils/status";
 import { useHelpdesk } from "../../context/HelpdeskContext";
 
 interface StatusChipProps extends Omit<ChipProps, "label"> {
-  status: Status;
+  status: string;
   category?: string; // Catégorie optionnelle pour obtenir les statuts spécifiques
   showValue?: boolean;
   size?: "small" | "medium";

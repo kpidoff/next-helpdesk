@@ -1,10 +1,10 @@
-import { Priority, Status, User } from "../types";
+import { Priority, User } from "../types";
 import React, { ReactNode, createContext, useContext } from "react";
 
 export type UserRole = "user" | "agent" | "admin";
 
 export interface StatusConfig {
-  value: Status;
+  value: string;
   label: string;
   color?:
     | "primary"
@@ -20,7 +20,7 @@ export interface CategoryConfig {
   value: string;
   label: string;
   statuses: StatusConfig[];
-  defaultStatus?: Status;
+  defaultStatus?: string;
 }
 
 export interface HelpdeskConfig {
@@ -60,7 +60,7 @@ export interface HelpdeskContextType {
   setCurrentUser: (user: User) => void;
   setUsers: (users: User[]) => void;
   getStatusesForCategory: (category: string) => StatusConfig[];
-  getDefaultStatusForCategory: (category: string) => Status | undefined;
+  getDefaultStatusForCategory: (category: string) => string | undefined;
 }
 
 const defaultConfig: HelpdeskConfig = {
@@ -215,7 +215,7 @@ export const HelpdeskProvider: React.FC<HelpdeskProviderProps> = ({
 
   // Fonction utilitaire pour obtenir le statut par défaut d'une catégorie
   const getDefaultStatusForCategory = React.useCallback(
-    (category: string): Status | undefined => {
+    (category: string): string | undefined => {
       const categoryConfig = config.categories.find(
         (c) => c.value === category
       );

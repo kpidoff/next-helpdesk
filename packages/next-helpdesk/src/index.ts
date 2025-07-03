@@ -19,7 +19,6 @@ export type {
   Ticket, 
   User, 
   Priority, 
-  Status,
   Comment,
   Attachment
 } from './types';

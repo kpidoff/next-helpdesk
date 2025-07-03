@@ -9,7 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Delete, Edit, Visibility } from "@mui/icons-material";
-import { Priority, Status, User } from "../../types";
+import { Priority, User } from "../../types";
 import { canDeleteTicket, canEditTicket } from "../../utils/permissions";
 import {
   getCategoryLabel as getCategoryLabelUtil,
@@ -29,7 +29,7 @@ interface TicketCardProps {
   title: string;
   description: string;
   priority: Priority;
-  status: Status;
+  status: string;
   createdAt: Date;
   author: User;
   category: string;
@@ -64,12 +64,12 @@ export const TicketCard: React.FC<TicketCardProps> = ({
     return getPriorityColorUtil(priority, config.priorities);
   };
 
-  const getStatusLabelLocal = (status: Status, category?: string) => {
+  const getStatusLabelLocal = (status: string, category?: string) => {
     const statuses = getStatusesForCategory(category, config);
     return getStatusLabelUtil(status, statuses);
   };
 
-  const getStatusColorLocal = (status: Status, category?: string) => {
+  const getStatusColorLocal = (status: string, category?: string) => {
     const statuses = getStatusesForCategory(category, config);
     return getStatusColorUtil(status, statuses);
   };

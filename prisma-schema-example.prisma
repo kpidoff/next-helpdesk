@@ -1,0 +1,148 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql" // ou "mysql" ou "sqlite"
+    url      = env("DATABASE_URL")
+}
+
+// Modèle User correspondant à l'interface User de Next-Helpdesk
+model User {
+    id        String   @id @default(cuid())
+    name      String
+    email     String   @unique
+    avatar    String? // URL de l'avatar
+    role      UserRole @default(USER)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Relations
+    authoredTickets    Ticket[]            @relation("TicketAuthor")
+    assignedTickets    Ticket[]            @relation("TicketAssignee")
+    comments           Comment[]           @relation("CommentAuthor")
+    attachments        Attachment[]        @relation("AttachmentUploader")
+    commentAttachments CommentAttachment[] @relation("CommentAttachmentUploader")
+
+    @@map("users")
+}
+
+// Modèle Ticket correspondant à l'interface Ticket de Next-Helpdesk
+model Ticket {
+    id          String    @id @default(cuid())
+    title       String
+    description String
+    priority    Priority  @default(MEDIUM)
+    status      Status    @default(OPEN)
+    category    String
+    hoursSpent  Float?    @default(0)
+    startDate   DateTime?
+    endDate     DateTime?
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+
+    // Relations
+    authorId String
+    author   User   @relation("TicketAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+    assignedToId String?
+    assignedTo   User?   @relation("TicketAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+
+    comments    Comment[]
+    attachments Attachment[]
+
+    @@map("tickets")
+}
+
+// Modèle Comment correspondant à l'interface Comment de Next-Helpdesk
+model Comment {
+    id        String   @id @default(cuid())
+    content   String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Relations
+    authorId String
+    author   User   @relation("CommentAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+
+    ticketId String
+    ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+    attachments CommentAttachment[]
+
+    @@map("comments")
+}
+
+// Modèle Attachment correspondant à l'interface Attachment de Next-Helpdesk
+model Attachment {
+    id         String   @id @default(cuid())
+    filename   String
+    url        String
+    size       Int
+    type       String
+    uploadedAt DateTime @default(now())
+
+    // Relations
+    uploadedById String
+    uploadedBy   User   @relation("AttachmentUploader", fields: [uploadedById], references: [id], onDelete: Cascade)
+
+    ticketId String
+    ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+    @@map("attachments")
+}
+
+// Modèle pour les pièces jointes des commentaires
+model CommentAttachment {
+    id         String   @id @default(cuid())
+    filename   String
+    url        String
+    size       Int
+    type       String
+    uploadedAt DateTime @default(now())
+
+    // Relations
+    uploadedById String
+    uploadedBy   User   @relation("CommentAttachmentUploader", fields: [uploadedById], references: [id], onDelete: Cascade)
+
+    commentId String
+    comment   Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+    @@map("comment_attachments")
+}
+
+// Modèle Category pour gérer les catégories de tickets
+model Category {
+    id          String   @id @default(cuid())
+    name        String   @unique
+    description String?
+    color       String?
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    @@map("categories")
+}
+
+// Enums correspondant aux types de Next-Helpdesk
+enum Priority {
+    LOW
+    MEDIUM
+    HIGH
+}
+
+enum Status {
+    OPEN
+    IN_PROGRESS
+    IN_TEST
+    RESOLVED
+    CLOSED
+}
+
+enum UserRole {
+    USER
+    AGENT
+    ADMIN
+}

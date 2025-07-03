@@ -27,7 +27,7 @@ import {
   ViewModule,
   Visibility,
 } from "@mui/icons-material";
-import { Priority, Status, Ticket, User } from "../../types";
+import { Priority, Ticket } from "../../types";
 import React, { useState } from "react";
 import {
   canDeleteTicket,
@@ -96,12 +96,12 @@ export const TicketList: React.FC<TicketListProps> = ({
     }
   }, [isMobile, viewMode]);
 
-  const getStatusLabelLocal = (status: Status, category?: string) => {
+  const getStatusLabelLocal = (status: string, category?: string) => {
     const statuses = getStatusesForCategory(category, config);
     return getStatusLabelUtil(status, statuses);
   };
 
-  const getStatusColorLocal = (status: Status, category?: string) => {
+  const getStatusColorLocal = (status: string, category?: string) => {
     const statuses = getStatusesForCategory(category, config);
     return getStatusColorUtil(status, statuses);
   };

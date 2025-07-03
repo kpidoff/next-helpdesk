@@ -1,7 +1,6 @@
 import { ReactNode } from 'react';
 
 export type Priority = 'low' | 'medium' | 'high';
-export type Status = 'open' | 'in_progress' | 'in_test' | 'resolved' | 'closed';
 
 export interface User {
   id: string;
@@ -16,7 +15,7 @@ export interface Ticket {
   title: string;
   description: string;
   priority: Priority;
-  status: Status;
+  status: string;
   category: string;
   createdAt: Date;
   updatedAt: Date;

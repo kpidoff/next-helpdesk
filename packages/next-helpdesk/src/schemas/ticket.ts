@@ -32,9 +32,7 @@ export const createTicketSchema = z.object({
 });
 
 export const updateTicketSchema = createTicketSchema.extend({
-  status: z.enum(['open', 'in_progress', 'in_test', 'resolved', 'closed'], {
-    required_error: 'Veuillez sélectionner un statut',
-  }),
+  status: z.string().optional(),
   hoursSpent: z
     .number()
     .min(0, 'Le nombre d\'heures ne peut pas être négatif')

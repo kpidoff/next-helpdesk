@@ -1,6 +1,29 @@
 {
   "name": "@next-helpdesk/core",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "description": "Une bibliothèque React/Next.js complète pour systèmes de support/ticketing avec Kanban, diagramme de Gantt et gestion des tickets",
+  "keywords": [
+    "react",
+    "next.js",
+    "helpdesk",
+    "ticketing",
+    "support",
+    "kanban",
+    "gantt",
+    "typescript",
+    "material-ui",
+    "ticket-management"
+  ],
+  "author": "kpidoff",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kpidoff/next-helpdesk.git"
+  },
+  "homepage": "https://github.com/kpidoff/next-helpdesk#readme",
+  "bugs": {
+    "url": "https://github.com/kpidoff/next-helpdesk/issues"
+  },
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -10,7 +33,9 @@
   "scripts": {
     "dev": "nodemon --watch src --ext ts,tsx --exec \"tsup\"",
     "build": "tsup src/index.ts --format cjs,esm --dts --external react --sourcemap",
-    "lint": "eslint src --ext .ts,.tsx"
+    "lint": "eslint src --ext .ts,.tsx",
+    "prepublishOnly": "pnpm build",
+    "prepack": "pnpm build"
   },
   "dependencies": {
     "@caldwell619/react-kanban": "^0.0.12",
