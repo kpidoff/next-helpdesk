@@ -5,6 +5,14 @@ Tous les changements notables de ce projet seront documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [1.0.4] - 2024-12-19
+
+### Corrigé
+- **useKanbanBoard** : Correction du type TypeScript pour la conversion des tickets en cartes Kanban
+  - Ajout de valeurs par défaut pour `comments` et `attachments` lors de la conversion
+  - Résolution de l'incompatibilité entre `Comment[] | undefined` et `any[]`
+  - Amélioration de la robustesse du code avec des tableaux vides par défaut
+
 ## [1.0.3] - 2024-12-19
 
 ### Corrigé

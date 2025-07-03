@@ -21,8 +21,8 @@ export interface Ticket {
   updatedAt: Date;
   author: User;
   assignedTo?: User;
-  comments: Comment[];
-  attachments: Attachment[];
+  comments?: Comment[];
+  attachments?: Attachment[];
   hoursSpent?: number;
   startDate?: Date;
   endDate?: Date;

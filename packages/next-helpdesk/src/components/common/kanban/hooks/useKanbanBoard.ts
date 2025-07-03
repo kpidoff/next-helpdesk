@@ -22,8 +22,8 @@ export const useKanbanBoard = (
       createdAt: ticket.createdAt,
       updatedAt: ticket.updatedAt,
       hoursSpent: ticket.hoursSpent,
-      comments: ticket.comments,
-      attachments: ticket.attachments,
+      comments: ticket.comments || [],
+      attachments: ticket.attachments || [],
     }));
   };
 

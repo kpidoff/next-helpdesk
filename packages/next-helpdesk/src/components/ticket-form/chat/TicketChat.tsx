@@ -18,7 +18,7 @@ import { AttachmentPreview } from "../common";
 import { UserAvatar } from "@/components/common";
 
 interface TicketChatProps {
-  comments: Comment[];
+  comments?: Comment[];
   currentUser: User;
   onAddComment: (content: string, attachments?: File[]) => Promise<void>;
   loading?: boolean;
@@ -107,7 +107,7 @@ export const TicketChat: React.FC<TicketChatProps> = ({
       >
         <Typography variant="h6">Conversation</Typography>
         <Typography variant="caption" color="text.secondary">
-          {comments.length} commentaire{comments.length !== 1 ? "s" : ""}
+          {comments?.length} commentaire{comments?.length !== 1 ? "s" : ""}
         </Typography>
       </Box>
 
@@ -122,7 +122,7 @@ export const TicketChat: React.FC<TicketChatProps> = ({
           gap: 2,
         }}
       >
-        {comments.length === 0 ? (
+        {comments?.length === 0 ? (
           <Box
             sx={{
               display: "flex",
@@ -141,7 +141,7 @@ export const TicketChat: React.FC<TicketChatProps> = ({
             </Typography>
           </Box>
         ) : (
-          comments.map((comment) => {
+          comments?.map((comment) => {
             const isCurrentUser = comment.author.id === currentUser.id;
 
             return (
