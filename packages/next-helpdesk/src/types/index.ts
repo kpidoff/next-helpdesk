@@ -1,0 +1,56 @@
+import { ReactNode } from 'react';
+
+export type Priority = 'low' | 'medium' | 'high';
+export type Status = 'open' | 'in_progress' | 'in_test' | 'resolved' | 'closed';
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string | ReactNode | null;
+  role: 'user' | 'admin' | 'agent';
+}
+
+export interface Ticket {
+  id: string;
+  title: string;
+  description: string;
+  priority: Priority;
+  status: Status;
+  category: string;
+  createdAt: Date;
+  updatedAt: Date;
+  author: User;
+  assignedTo?: User;
+  comments: Comment[];
+  attachments: Attachment[];
+  hoursSpent?: number;
+  startDate?: Date;
+  endDate?: Date;
+}
+
+export interface Comment {
+  id: string;
+  content: string;
+  createdAt: Date;
+  author: User;
+  ticketId: string;
+  attachments?: Attachment[];
+}
+
+export interface Attachment {
+  id: string;
+  filename: string;
+  url: string;
+  size: number;
+  type: string;
+  uploadedAt: Date;
+  uploadedBy: User;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  description?: string;
+  color?: string;
+} 

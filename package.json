@@ -1,0 +1,41 @@
+{
+  "name": "next-helpdesk",
+  "version": "1.0.0",
+  "description": "Une application de helpdesk moderne construite avec Next.js 14 et Material-UI",
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VOTRE-USERNAME/next-helpdesk.git"
+  },
+  "keywords": [
+    "react",
+    "next.js",
+    "material-ui",
+    "typescript",
+    "helpdesk",
+    "support",
+    "tickets"
+  ],
+  "author": "VOTRE-NOM",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/VOTRE-USERNAME/next-helpdesk/issues"
+  },
+  "homepage": "https://github.com/VOTRE-USERNAME/next-helpdesk#readme",
+  "scripts": {
+    "dev": "pnpm -r dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@caldwell619/react-kanban": "^0.0.12",
+    "@hello-pangea/dnd": "^18.0.1",
+    "gantt-task-react": "^0.3.9"
+  }
+}
