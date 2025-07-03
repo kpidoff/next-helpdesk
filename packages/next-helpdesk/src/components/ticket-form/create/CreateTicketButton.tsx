@@ -4,15 +4,12 @@ import React, { useState } from "react";
 import { Add } from "@mui/icons-material";
 import { CreateTicketForm } from "./CreateTicketForm";
 import { CreateTicketFormData } from "@/schemas/ticket";
-import { User } from "@/types";
 
 interface CreateTicketButtonProps {
-  onSubmit: (data: CreateTicketFormData) => void;
+  onSubmit: (data: CreateTicketFormData) => Promise<void>;
   loading?: boolean;
   variant?: "button" | "fab";
   buttonText?: string;
-  users?: User[];
-  currentUser?: User;
 }
 
 export const CreateTicketButton: React.FC<CreateTicketButtonProps> = ({
@@ -20,16 +17,14 @@ export const CreateTicketButton: React.FC<CreateTicketButtonProps> = ({
   loading = false,
   variant = "button",
   buttonText = "Nouveau ticket",
-  users = [],
-  currentUser,
 }) => {
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleSubmit = (data: CreateTicketFormData) => {
-    onSubmit(data);
+  const handleSubmit = async (data: CreateTicketFormData) => {
+    await onSubmit(data);
     handleClose();
   };
 
@@ -66,8 +61,6 @@ export const CreateTicketButton: React.FC<CreateTicketButtonProps> = ({
         onClose={handleClose}
         onSubmit={handleSubmit}
         loading={loading}
-        users={users}
-        currentUser={currentUser}
       />
     </>
   );

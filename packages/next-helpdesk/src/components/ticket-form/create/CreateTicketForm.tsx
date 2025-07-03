@@ -27,10 +27,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 interface CreateTicketFormProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: CreateTicketFormData) => void;
+  onSubmit: (data: CreateTicketFormData) => Promise<void>;
   loading?: boolean;
-  users?: User[];
-  currentUser?: User;
 }
 
 export const CreateTicketForm: React.FC<CreateTicketFormProps> = ({
@@ -38,14 +36,13 @@ export const CreateTicketForm: React.FC<CreateTicketFormProps> = ({
   onClose,
   onSubmit,
   loading = false,
-  users = [],
-  currentUser,
 }) => {
-  const { config } = useHelpdesk();
+  const { config, currentUser, users } = useHelpdesk();
   const [previewImage, setPreviewImage] = useState<{
     file: File;
     url: string;
   } | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const methods = useForm<CreateTicketFormData>({
     resolver: zodResolver(createTicketSchema),
@@ -66,9 +63,16 @@ export const CreateTicketForm: React.FC<CreateTicketFormProps> = ({
     formState: { errors },
   } = methods;
 
-  const handleFormSubmit = (data: CreateTicketFormData) => {
-    onSubmit(data);
-    reset();
+  const handleFormSubmit = async (data: CreateTicketFormData) => {
+    try {
+      setIsSubmitting(true);
+      await onSubmit(data);
+      reset();
+    } catch (error) {
+      console.error("Erreur lors de la création du ticket:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleClose = () => {
@@ -84,6 +88,8 @@ export const CreateTicketForm: React.FC<CreateTicketFormProps> = ({
     // La logique de suppression sera gérée par le composant TicketFileUpload
   };
 
+  const isButtonLoading = loading || isSubmitting;
+
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogTitle sx={{ borderBottom: 1, borderColor: "divider" }}>
@@ -94,8 +100,6 @@ export const CreateTicketForm: React.FC<CreateTicketFormProps> = ({
         <form onSubmit={handleSubmit(handleFormSubmit)}>
           <DialogContent>
             <Box display="flex" flexDirection="column" gap={3}>
-              <TicketBasicFields control={control} errors={errors} />
-
               <TicketCategoryField control={control} errors={errors} />
 
               <TicketPriorityField
@@ -103,6 +107,8 @@ export const CreateTicketForm: React.FC<CreateTicketFormProps> = ({
                 errors={errors}
                 currentUser={currentUser}
               />
+
+              <TicketBasicFields control={control} errors={errors} />
 
               <TicketAssignmentField
                 control={control}
@@ -113,7 +119,7 @@ export const CreateTicketForm: React.FC<CreateTicketFormProps> = ({
               <TicketFileUpload
                 control={control}
                 errors={errors}
-                loading={loading}
+                loading={isButtonLoading}
                 onPreview={handlePreview}
                 onRemove={handleRemoveFile}
               />
@@ -121,11 +127,15 @@ export const CreateTicketForm: React.FC<CreateTicketFormProps> = ({
           </DialogContent>
 
           <DialogActions sx={{ borderTop: 1, borderColor: "divider" }}>
-            <Button onClick={handleClose} disabled={loading}>
+            <Button onClick={handleClose} disabled={isButtonLoading}>
               Annuler
             </Button>
-            <Button type="submit" variant="contained" disabled={loading}>
-              {loading ? "Création..." : "Créer le ticket"}
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={isButtonLoading}
+            >
+              {isButtonLoading ? "Création..." : "Créer le ticket"}
             </Button>
           </DialogActions>
         </form>
