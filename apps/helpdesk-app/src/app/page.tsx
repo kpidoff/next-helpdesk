@@ -509,7 +509,7 @@ export default function Home() {
         if (ticket.id === ticketId) {
           return {
             ...ticket,
-            comments: [...ticket.comments, newComment],
+            comments: [...(ticket.comments || []), newComment],
             updatedAt: new Date(),
           };
         }

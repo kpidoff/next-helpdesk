@@ -59,13 +59,13 @@ interface TicketDetailDialogProps {
   onUpdateTicket?: (
     ticketId: string,
     data: Partial<UpdateTicketFormData>
-  ) => void;
+  ) => Promise<void>;
   onAddComment?: (
     ticketId: string,
     content: string,
     files?: File[]
   ) => Promise<void>;
-  onCloseTicket?: (ticketId: string) => void;
+  onCloseTicket?: (ticketId: string) => Promise<void>;
   loading?: boolean;
   mode?: "view" | "edit";
 }
@@ -85,6 +85,8 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
   const { config } = useHelpdesk();
   const [isEditing, setIsEditing] = useState(mode === "edit");
   const [chatLoading, setChatLoading] = useState(false);
+  const [updateLoading, setUpdateLoading] = useState(false);
+  const [closeLoading, setCloseLoading] = useState(false);
   const [previewAttachment, setPreviewAttachment] = useState<{
     attachment: Attachment;
     url: string;
@@ -127,10 +129,15 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
     });
   }, [ticket, reset]);
 
-  const handleSave = (data: UpdateTicketFormData) => {
+  const handleSave = async (data: UpdateTicketFormData) => {
     if (onUpdateTicket) {
-      onUpdateTicket(ticket.id, data);
-      setIsEditing(false);
+      setUpdateLoading(true);
+      try {
+        await onUpdateTicket(ticket.id, data);
+        setIsEditing(false);
+      } finally {
+        setUpdateLoading(false);
+      }
     }
   };
 
@@ -150,12 +157,17 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
     }
   };
 
-  const handleCloseTicket = () => {
+  const handleCloseTicket = async () => {
     if (
       onCloseTicket &&
       (currentUser.role === "admin" || currentUser.role === "agent")
     ) {
-      onCloseTicket(ticket.id);
+      setCloseLoading(true);
+      try {
+        await onCloseTicket(ticket.id);
+      } finally {
+        setCloseLoading(false);
+      }
     }
   };
 
@@ -660,19 +672,19 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
                 onClick={handleCloseTicket}
                 variant="outlined"
                 color="secondary"
-                disabled={loading}
+                disabled={updateLoading || closeLoading}
               >
-                Clôturer le ticket
+                {closeLoading ? "Clôture..." : "Clôturer le ticket"}
               </Button>
             )}
             <Button
               type="submit"
               variant="contained"
               onClick={handleSubmit(handleSave)}
-              disabled={loading || !isDirty}
+              disabled={updateLoading || !isDirty}
               startIcon={<Save />}
             >
-              {loading ? "Sauvegarde..." : "Sauvegarder"}
+              {updateLoading ? "Sauvegarde..." : "Sauvegarder"}
             </Button>
           </>
         ) : (
@@ -682,9 +694,9 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
                 onClick={handleCloseTicket}
                 variant="outlined"
                 color="secondary"
-                disabled={loading}
+                disabled={closeLoading}
               >
-                Clôturer le ticket
+                {closeLoading ? "Clôture..." : "Clôturer le ticket"}
               </Button>
             )}
             <Button onClick={onClose}>Fermer</Button>

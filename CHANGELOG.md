@@ -5,6 +5,21 @@ Tous les changements notables de ce projet seront documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [1.0.3] - 2024-12-19
+
+### Corrigé
+- **TicketDetailDialog** : Amélioration de la gestion asynchrone des opérations
+  - Les fonctions `onUpdateTicket`, `onAddComment` et `onCloseTicket` sont maintenant correctement typées comme `Promise<void>`
+  - Ajout d'états de chargement spécifiques (`updateLoading`, `closeLoading`, `chatLoading`) pour chaque opération
+  - Les boutons affichent des indicateurs de chargement appropriés ("Sauvegarde...", "Clôture...")
+  - Prévention des actions multiples pendant les opérations asynchrones
+  - Gestion robuste des erreurs avec try/catch/finally
+
+### Amélioré
+- **TicketList** : Mise à jour des types d'interface pour correspondre aux nouvelles signatures asynchrones
+- Meilleure expérience utilisateur avec des feedback visuels pendant les opérations
+- Gestion cohérente des états de chargement dans toute l'application
+
 ## [1.0.2] - 2024-12-19
 
 ### Corrigé

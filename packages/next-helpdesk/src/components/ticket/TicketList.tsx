@@ -57,13 +57,13 @@ interface TicketListProps {
   onUpdateTicket?: (
     ticketId: string,
     data: Partial<CreateTicketFormData>
-  ) => void;
+  ) => Promise<void>;
   onAddComment?: (
     ticketId: string,
     content: string,
     files?: File[]
   ) => Promise<void>;
-  onCloseTicket?: (ticketId: string) => void;
+  onCloseTicket?: (ticketId: string) => Promise<void>;
   loading?: boolean;
   title?: string;
 }
@@ -196,6 +196,11 @@ export const TicketList: React.FC<TicketListProps> = ({
     }
   };
 
+  // Filtrer les tickets selon les permissions - DOIT être avant les conditions de retour
+  const filteredTickets = React.useMemo(() => {
+    return filterTicketsByPermission(tickets, currentUser);
+  }, [tickets, currentUser]);
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" p={3}>
@@ -203,11 +208,6 @@ export const TicketList: React.FC<TicketListProps> = ({
       </Box>
     );
   }
-
-  // Filtrer les tickets selon les permissions
-  const filteredTickets = React.useMemo(() => {
-    return filterTicketsByPermission(tickets, currentUser);
-  }, [tickets, currentUser]);
 
   if (filteredTickets.length === 0) {
     return (
