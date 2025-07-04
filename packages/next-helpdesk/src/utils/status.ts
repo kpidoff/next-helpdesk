@@ -54,7 +54,7 @@ export function getStatusesForCategory(
   config: HelpdeskConfig
 ): StatusConfig[] {
   if (category) {
-    const cat = config.categories.find(c => c.value === category);
+    const cat = config.categories.find(c => c.value.toLowerCase() === category.toLowerCase());
     if (cat && cat.statuses && cat.statuses.length > 0) {
       return cat.statuses;
     }
@@ -72,6 +72,6 @@ export const getDefaultStatusForCategory = (
   category: string,
   config: HelpdeskConfig
 ): string | undefined => {
-  const categoryConfig = config.categories.find(c => c.value === category);
+  const categoryConfig = config.categories.find(c => c.value.toLowerCase() === category.toLowerCase());
   return categoryConfig?.defaultStatus;
 }; 

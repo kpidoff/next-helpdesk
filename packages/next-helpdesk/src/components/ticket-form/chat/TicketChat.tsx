@@ -179,39 +179,6 @@ export const TicketChat: React.FC<TicketChatProps> = ({
                       boxShadow: isCurrentUser ? 1 : 0,
                     }}
                   >
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        mb: 0.5,
-                        flexDirection: isCurrentUser ? "row-reverse" : "row",
-                      }}
-                    >
-                      <Typography
-                        variant="subtitle2"
-                        fontWeight="medium"
-                        sx={{
-                          color: isCurrentUser
-                            ? "primary.contrastText"
-                            : "text.primary",
-                        }}
-                      >
-                        {comment.author.name}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: isCurrentUser
-                            ? "primary.contrastText"
-                            : "text.secondary",
-                          opacity: 0.8,
-                        }}
-                      >
-                        {formatDate(comment.createdAt)}
-                      </Typography>
-                    </Box>
-
                     {/* Contenu du commentaire */}
                     {comment.content && (
                       <Typography
@@ -278,6 +245,31 @@ export const TicketChat: React.FC<TicketChatProps> = ({
                         </Box>
                       </Box>
                     )}
+
+                    {/* Date du commentaire en bas */}
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: isCurrentUser
+                          ? "flex-end"
+                          : "flex-start",
+                        mt: 1,
+                      }}
+                    >
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: isCurrentUser
+                            ? "primary.contrastText"
+                            : "text.secondary",
+                          opacity: 0.7,
+                          fontStyle: "italic",
+                          fontSize: "0.7rem",
+                        }}
+                      >
+                        {formatDate(comment.createdAt)}
+                      </Typography>
+                    </Box>
                   </Box>
                 </Box>
               </Box>

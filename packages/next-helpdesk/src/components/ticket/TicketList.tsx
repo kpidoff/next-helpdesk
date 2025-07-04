@@ -28,7 +28,7 @@ import {
   Visibility,
 } from "@mui/icons-material";
 import { Priority, Ticket } from "../../types";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   canDeleteTicket,
   canEditTicket,
@@ -186,6 +186,16 @@ export const TicketList: React.FC<TicketListProps> = ({
     }
   };
 
+  // Mettre à jour le ticket sélectionné quand les tickets changent
+  useEffect(() => {
+    if (selectedTicket) {
+      const updatedTicket = tickets.find((t) => t.id === selectedTicket.id);
+      if (updatedTicket && updatedTicket !== selectedTicket) {
+        setSelectedTicket(updatedTicket);
+      }
+    }
+  }, [tickets, selectedTicket]);
+
   const handleAddComment = async (
     ticketId: string,
     content: string,
@@ -195,13 +205,6 @@ export const TicketList: React.FC<TicketListProps> = ({
       setDialogLoading(true);
       try {
         await onAddComment(ticketId, content, files);
-        // Mettre à jour le ticket sélectionné avec les nouveaux commentaires
-        setSelectedTicket((prev) => {
-          if (!prev || prev.id !== ticketId) return prev;
-          // Trouver le ticket mis à jour dans la liste
-          const updatedTicket = tickets.find((t) => t.id === ticketId);
-          return updatedTicket || prev;
-        });
       } finally {
         setDialogLoading(false);
       }
