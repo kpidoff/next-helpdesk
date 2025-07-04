@@ -29,33 +29,12 @@ export const TicketKanban: React.FC<TicketKanbanProps> = ({
       ).length;
       return ticketCount > 0;
     });
-    return (
-      categoryWithTickets?.value ||
-      (categories.length > 0 ? categories[0].value : "")
-    );
+    return categoryWithTickets?.value || "";
   });
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const { kanbanBoard } = useKanbanBoard(tickets, categories, selectedCategory);
-
-  // Mettre à jour la catégorie sélectionnée si nécessaire
-  useEffect(() => {
-    if (
-      categories.length > 0 &&
-      (!selectedCategory || selectedCategory === "")
-    ) {
-      // Si aucune catégorie n'est sélectionnée, sélectionner la première qui a des tickets
-      const categoryWithTickets = categories.find((cat) => {
-        const ticketCount = tickets.filter(
-          (t) => t.category === cat.value
-        ).length;
-        return ticketCount > 0;
-      });
-      const newCategory = categoryWithTickets?.value || categories[0].value;
-      setSelectedCategory(newCategory);
-    }
-  }, [categories, tickets, selectedCategory]);
 
   // Mettre à jour le ticket sélectionné quand les tickets changent
   useEffect(() => {
@@ -96,7 +75,7 @@ export const TicketKanban: React.FC<TicketKanbanProps> = ({
 
       {/* Sélecteur d'onglets de catégorie */}
       <Tabs
-        value={selectedCategory || false}
+        value={selectedCategory}
         onChange={(_, v) => setSelectedCategory(v)}
         sx={{ mb: 2 }}
         variant="scrollable"
@@ -150,7 +129,15 @@ export const TicketKanban: React.FC<TicketKanbanProps> = ({
                 onUpdateTicket(String(source.id), {
                   status: newStatus,
                 });
+              } else {
+                console.warn("Could not find card in any column after move");
               }
+            } else {
+              console.warn("Missing required data for update:", {
+                hasOnUpdateTicket: !!onUpdateTicket,
+                hasSourceId: !!source?.id,
+                destination,
+              });
             }
           }}
         />
