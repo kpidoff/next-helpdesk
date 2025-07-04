@@ -109,6 +109,8 @@ export const TicketKanban: React.FC<TicketKanbanProps> = ({
           renderCard={renderCard}
           allowAddCard={false}
           allowRemoveCard={false}
+          allowRenameColumn={false}
+          allowRemoveColumn={false}
           onCardDragEnd={(board: any, source: any, destination: any) => {
             // Trouver la nouvelle colonne de la carte dans le board mis à jour
             if (onUpdateTicket && source?.id) {
