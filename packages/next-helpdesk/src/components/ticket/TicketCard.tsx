@@ -32,6 +32,7 @@ interface TicketCardProps {
   status: string;
   createdAt: Date;
   author: User;
+  assignedTo?: User;
   category: string;
   currentUser: User;
   onView?: () => void;
@@ -48,6 +49,7 @@ export const TicketCard: React.FC<TicketCardProps> = ({
   status,
   createdAt,
   author,
+  assignedTo,
   category,
   currentUser,
   onView,
@@ -114,11 +116,18 @@ export const TicketCard: React.FC<TicketCardProps> = ({
         </Typography>
 
         <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Box display="flex" alignItems="center" gap={1}>
-            <UserAvatar user={author} size={24} />
-            <Typography variant="caption" color="text.secondary">
-              {author.name}
-            </Typography>
+          <Box display="flex" flexDirection="column" gap={1}>
+            <Box display="flex" alignItems="center" gap={1}>
+              <UserAvatar user={author} size={24} />
+              <Typography variant="caption" color="text.secondary">
+                {author.name}
+              </Typography>
+            </Box>
+            {assignedTo && (
+              <Box display="flex" alignItems="center" gap={1}>
+                <UserAvatar user={assignedTo} size={24} />
+              </Box>
+            )}
           </Box>
 
           <Box display="flex" gap={1}>

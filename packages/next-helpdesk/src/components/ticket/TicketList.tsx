@@ -290,6 +290,7 @@ export const TicketList: React.FC<TicketListProps> = ({
                 <TableCell>Priorité</TableCell>
                 <TableCell>Statut</TableCell>
                 <TableCell>Auteur</TableCell>
+                <TableCell>Assigné à</TableCell>
                 <TableCell>Date</TableCell>
                 <TableCell>Actions</TableCell>
               </TableRow>
@@ -335,10 +336,18 @@ export const TicketList: React.FC<TicketListProps> = ({
                   <TableCell>
                     <Box display="flex" alignItems="center" gap={1}>
                       <UserAvatar user={ticket.author} size={24} />
-                      <Typography variant="body2">
-                        {ticket.author.name}
-                      </Typography>
                     </Box>
+                  </TableCell>
+                  <TableCell>
+                    {ticket.assignedTo ? (
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <UserAvatar user={ticket.assignedTo} size={24} />
+                      </Box>
+                    ) : (
+                      <Typography variant="body2" color="text.secondary">
+                        Non assigné
+                      </Typography>
+                    )}
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2" color="text.secondary">
@@ -452,11 +461,24 @@ export const TicketList: React.FC<TicketListProps> = ({
                     justifyContent="space-between"
                     alignItems="center"
                   >
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <UserAvatar user={ticket.author} size={24} />
-                      <Typography variant="caption" color="text.secondary">
-                        {ticket.author.name}
-                      </Typography>
+                    <Box display="flex" flexDirection="column" gap={1}>
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <UserAvatar user={ticket.author} size={24} />
+                        <Typography variant="caption" color="text.secondary">
+                          {ticket.author.name}
+                        </Typography>
+                      </Box>
+                      {ticket.assignedTo && (
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ ml: 2 }}
+                          >
+                            Assigné à: {ticket.assignedTo.name}
+                          </Typography>
+                        </Box>
+                      )}
                     </Box>
 
                     <Typography variant="caption" color="text.secondary">

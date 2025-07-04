@@ -5,6 +5,46 @@ Tous les changements notables de ce projet seront documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [1.0.8] - 2024-12-19
+
+### Corrigé
+- **TicketDetailDialog** : Correction de l'erreur MUI "out-of-range value" pour les statuts personnalisés
+  - Ajout de la prop `category={ticket.category}` au composant `StatusSelect`
+  - Utilisation des statuts spécifiques à la catégorie au lieu des statuts globaux
+  - Résolution du problème où les statuts personnalisés (comme "OPEN") n'étaient pas reconnus
+
+### Amélioré
+- **TicketDetailDialog** : Optimisation avec les utilitaires de `@/utils`
+  - Remplacement des fonctions hardcodées `getStatusColor` et `getPriorityColor` par les utilitaires centralisés
+  - Utilisation de `getStatusColor`, `getStatusLabel`, `getPriorityColor` et `getPriorityLabel` depuis les modules utils
+  - Amélioration de la cohérence et de la maintenabilité du code
+  - Support des couleurs et labels configurables via la configuration du helpdesk
+
+### Technique
+- Suppression du code dupliqué dans `TicketDetailDialog`
+- Utilisation des utilitaires centralisés pour une meilleure architecture
+- Support complet des statuts personnalisés par catégorie
+
+## [1.0.7] - 2024-12-19
+
+### Corrigé
+- **TicketList** : Correction du type TypeScript pour la mise à jour des tickets
+  - Changement de `CreateTicketFormData` vers `UpdateTicketFormData` dans l'interface
+  - Ajout de la gestion complète des champs `status`, `hoursSpent`, `startDate` et `endDate` dans `handleUpdateTicket`
+  - Résolution du problème où les modifications de statut et de suivi du temps n'étaient pas transmises
+
+### Amélioré
+- Mise à jour locale complète des tickets après modification
+- Meilleure cohérence des types entre les composants
+
+## [1.0.6] - 2024-12-19
+
+### Corrigé
+- **useKanbanBoard** : Correction du type TypeScript pour la conversion des tickets en cartes Kanban
+  - Ajout de valeurs par défaut pour `comments` et `attachments` lors de la conversion
+  - Résolution de l'incompatibilité entre `Comment[] | undefined` et `any[]`
+  - Amélioration de la robustesse du code avec des tableaux vides par défaut
+
 ## [1.0.5] - 2024-12-19
 
 ### Corrigé

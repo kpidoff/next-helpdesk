@@ -41,12 +41,17 @@ import {
   UpdateTicketFormData,
   updateTicketSchema,
 } from "../../../schemas/ticket";
+import { getPriorityColor, getPriorityLabel } from "../../../utils/priority";
+import {
+  getStatusColor,
+  getStatusLabel,
+  getStatusesForCategory,
+} from "../../../utils/status";
 
 import { AttachmentPreview } from "../common/AttachmentPreview";
 import { FilePreview } from "../common/FilePreview";
 import { TicketChat } from "../chat/TicketChat";
 import { capitalizeFirstChar } from "../../../utils/string";
-import { getStatusesForCategory } from "../../../utils/status";
 import { useHelpdesk } from "../../../context/HelpdeskContext";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -183,34 +188,6 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
     }).format(date);
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "open":
-        return "primary";
-      case "in_progress":
-        return "warning";
-      case "resolved":
-        return "success";
-      case "closed":
-        return "default";
-      default:
-        return "default";
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return "error";
-      case "medium":
-        return "warning";
-      case "low":
-        return "success";
-      default:
-        return "default";
-    }
-  };
-
   const statuses = getStatusesForCategory(ticket.category, config);
 
   return (
@@ -255,19 +232,13 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
               <Grid item xs={12}>
                 <Box display="flex" gap={2} alignItems="center" mb={2}>
                   <Chip
-                    label={
-                      statuses.find((s) => s.value === ticket.status)?.label ||
-                      ticket.status
-                    }
-                    color={getStatusColor(ticket.status)}
+                    label={getStatusLabel(ticket.status, statuses)}
+                    color={getStatusColor(ticket.status, statuses)}
                     size="small"
                   />
                   <Chip
-                    label={
-                      config.priorities.find((p) => p.value === ticket.priority)
-                        ?.label || ticket.priority
-                    }
-                    color={getPriorityColor(ticket.priority)}
+                    label={getPriorityLabel(ticket.priority, config.priorities)}
+                    color={getPriorityColor(ticket.priority, config.priorities)}
                     size="small"
                   />
                   <Typography variant="caption" color="text.secondary">
@@ -418,14 +389,12 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
                             label="Statut"
                             error={!!errors.status}
                             helperText={errors.status?.message}
+                            category={ticket.category}
                           />
                         ) : (
                           <TextField
                             label="Statut"
-                            value={
-                              statuses.find((s) => s.value === ticket.status)
-                                ?.label || ticket.status
-                            }
+                            value={getStatusLabel(ticket.status, statuses)}
                             fullWidth
                             disabled
                             helperText="Seuls les agents et admins peuvent modifier le statut"
@@ -441,8 +410,7 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
                             Statut
                           </Typography>
                           <Typography variant="body1">
-                            {statuses.find((s) => s.value === ticket.status)
-                              ?.label || ticket.status}
+                            {getStatusLabel(ticket.status, statuses)}
                           </Typography>
                         </Box>
                       )}
@@ -463,11 +431,10 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
                         ) : (
                           <TextField
                             label="Priorité"
-                            value={
-                              config.priorities.find(
-                                (p) => p.value === ticket.priority
-                              )?.label || ticket.priority
-                            }
+                            value={getPriorityLabel(
+                              ticket.priority,
+                              config.priorities
+                            )}
                             fullWidth
                             disabled
                             helperText="Seuls les agents et admins peuvent modifier la priorité"
@@ -483,9 +450,10 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
                             Priorité
                           </Typography>
                           <Typography variant="body1">
-                            {config.priorities.find(
-                              (p) => p.value === ticket.priority
-                            )?.label || ticket.priority}
+                            {getPriorityLabel(
+                              ticket.priority,
+                              config.priorities
+                            )}
                           </Typography>
                         </Box>
                       )}

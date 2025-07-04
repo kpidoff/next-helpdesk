@@ -32,7 +32,7 @@ export interface Comment {
   id: string;
   content: string;
   createdAt: Date;
-  author: User;
+  author: Omit<User, 'role'>;
   ticketId: string;
   attachments?: Attachment[];
 }
@@ -44,7 +44,7 @@ export interface Attachment {
   size: number;
   type: string;
   uploadedAt: Date;
-  uploadedBy: User;
+  uploadedBy: Omit<User, 'role'>;
 }
 
 export interface Category {
