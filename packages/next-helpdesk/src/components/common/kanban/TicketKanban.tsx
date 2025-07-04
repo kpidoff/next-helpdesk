@@ -17,7 +17,8 @@ export const TicketKanban: React.FC<TicketKanbanProps> = ({
   onUpdateTicket,
   onAddComment,
   onCloseTicket,
-  title = "Vue Kanban des Tickets",
+  title,
+  description,
   height = 600,
 }) => {
   const { config, currentUser, users } = useHelpdesk();
@@ -66,13 +67,16 @@ export const TicketKanban: React.FC<TicketKanbanProps> = ({
 
   return (
     <Paper sx={{ p: 3 }}>
-      <Typography variant="h6" gutterBottom>
-        {title}
-      </Typography>
-      <Typography variant="body2" color="text.secondary" paragraph>
-        Vue Kanban des tickets organisés par statut. Glissez-déposez les tickets
-        pour changer leur statut.
-      </Typography>
+      {title && (
+        <Typography variant="h6" gutterBottom>
+          {title}
+        </Typography>
+      )}
+      {description && (
+        <Typography variant="body2" color="text.secondary" paragraph>
+          {description}
+        </Typography>
+      )}
 
       {/* Sélecteur d'onglets de catégorie */}
       <Tabs

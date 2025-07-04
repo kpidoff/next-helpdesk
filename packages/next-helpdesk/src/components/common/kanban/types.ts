@@ -9,6 +9,7 @@ export interface TicketKanbanProps {
   onAddComment?: (ticketId: string, content: string, files?: File[]) => Promise<void>;
   onCloseTicket?: (ticketId: string) => Promise<void>;
   title?: string;
+  description?: string;
   height?: number;
 }
 
