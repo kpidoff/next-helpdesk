@@ -29,12 +29,33 @@ export const TicketKanban: React.FC<TicketKanbanProps> = ({
       ).length;
       return ticketCount > 0;
     });
-    return categoryWithTickets?.value || "";
+    return (
+      categoryWithTickets?.value ||
+      (categories.length > 0 ? categories[0].value : "")
+    );
   });
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const { kanbanBoard } = useKanbanBoard(tickets, categories, selectedCategory);
+
+  // Mettre à jour la catégorie sélectionnée si nécessaire
+  useEffect(() => {
+    if (
+      categories.length > 0 &&
+      (!selectedCategory || selectedCategory === "")
+    ) {
+      // Si aucune catégorie n'est sélectionnée, sélectionner la première qui a des tickets
+      const categoryWithTickets = categories.find((cat) => {
+        const ticketCount = tickets.filter(
+          (t) => t.category === cat.value
+        ).length;
+        return ticketCount > 0;
+      });
+      const newCategory = categoryWithTickets?.value || categories[0].value;
+      setSelectedCategory(newCategory);
+    }
+  }, [categories, tickets, selectedCategory]);
 
   // Mettre à jour le ticket sélectionné quand les tickets changent
   useEffect(() => {
@@ -75,7 +96,7 @@ export const TicketKanban: React.FC<TicketKanbanProps> = ({
 
       {/* Sélecteur d'onglets de catégorie */}
       <Tabs
-        value={selectedCategory}
+        value={selectedCategory || false}
         onChange={(_, v) => setSelectedCategory(v)}
         sx={{ mb: 2 }}
         variant="scrollable"
@@ -109,21 +130,27 @@ export const TicketKanban: React.FC<TicketKanbanProps> = ({
           renderCard={renderCard}
           allowAddCard={false}
           allowRemoveCard={false}
-          onCardDragEnd={(card: any, source: any, destination: any) => {
-            console.log(
-              "Card moved:",
-              card.id,
-              "from",
-              source,
-              "to",
-              destination
-            );
+          onCardDragEnd={(board: any, source: any, destination: any) => {
+            // Trouver la nouvelle colonne de la carte dans le board mis à jour
+            if (onUpdateTicket && source?.id) {
+              let newStatus = null;
 
-            // Mettre à jour le statut du ticket
-            if (onUpdateTicket && destination?.toColumnId) {
-              onUpdateTicket(String(card.id), {
-                status: String(destination.toColumnId),
-              });
+              // Parcourir toutes les colonnes pour trouver où se trouve maintenant la carte
+              for (const column of board.columns) {
+                const cardInColumn = column.cards.find(
+                  (card: any) => card.id === source.id
+                );
+                if (cardInColumn) {
+                  newStatus = column.id;
+                  break;
+                }
+              }
+
+              if (newStatus) {
+                onUpdateTicket(String(source.id), {
+                  status: newStatus,
+                });
+              }
             }
           }}
         />

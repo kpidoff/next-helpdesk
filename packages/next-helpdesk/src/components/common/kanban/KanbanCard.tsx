@@ -81,11 +81,11 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
           mb: 1,
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <UserAvatar user={card.author} size={24} />
+        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
           <Typography variant="caption" color="text.secondary">
-            {card.author.name}
+            Créé par:
           </Typography>
+          <UserAvatar user={card.author} size={16} />
         </Box>
 
         <Typography variant="caption" color="text.secondary">
