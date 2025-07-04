@@ -12,10 +12,11 @@ import {
   Typography,
 } from "@mui/material";
 import { Comment, User } from "@/types";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { AttachmentPreview } from "../common";
 import { UserAvatar } from "@/components/common";
+import { capitalizeFirstChar } from "@/utils/string";
 
 interface TicketChatProps {
   comments?: Comment[];
@@ -34,6 +35,7 @@ export const TicketChat: React.FC<TicketChatProps> = ({
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,6 +88,26 @@ export const TicketChat: React.FC<TicketChatProps> = ({
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
+  // Scroll automatique vers le bas
+  const scrollToBottom = () => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  };
+
+  // Scroll vers le bas quand les commentaires changent
+  useEffect(() => {
+    scrollToBottom();
+  }, [comments]);
+
+  // Scroll vers le bas après l'envoi d'un commentaire
+  useEffect(() => {
+    if (!isSubmitting) {
+      scrollToBottom();
+    }
+  }, [isSubmitting]);
+
   return (
     <Box
       sx={{
@@ -113,6 +135,7 @@ export const TicketChat: React.FC<TicketChatProps> = ({
 
       {/* Zone des commentaires */}
       <Box
+        ref={chatContainerRef}
         sx={{
           flex: 1,
           overflow: "auto",
@@ -332,10 +355,23 @@ export const TicketChat: React.FC<TicketChatProps> = ({
             <TextField
               fullWidth
               multiline
-              rows={2}
               placeholder="Ajouter un commentaire..."
               value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                // Mettre le premier caractère en majuscule si c'est la première lettre
+                if (value.length === 1) {
+                  setNewComment(capitalizeFirstChar(value));
+                } else {
+                  setNewComment(value);
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.ctrlKey && e.key === "Enter") {
+                  e.preventDefault();
+                  handleSubmit(e as any);
+                }
+              }}
               disabled={loading || isSubmitting}
               sx={{
                 "& .MuiInputBase-root": {
