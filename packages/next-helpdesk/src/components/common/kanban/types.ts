@@ -5,7 +5,7 @@ import { UpdateTicketFormData } from "@/schemas/ticket";
 
 export interface TicketKanbanProps {
   tickets: Ticket[];
-  onUpdateTicket?: (ticketId: string, data: Partial<UpdateTicketFormData> | Ticket) => Promise<void>;
+  onUpdateTicket?: (ticketId: string, data: Partial<UpdateTicketFormData>) => Promise<void>;
   onAddComment?: (ticketId: string, content: string, files?: File[]) => Promise<void>;
   onCloseTicket?: (ticketId: string) => Promise<void>;
   title?: string;
