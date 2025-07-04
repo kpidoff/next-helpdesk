@@ -57,11 +57,6 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
         {/* Priorité et catégorie */}
         <Box sx={{ display: "flex", gap: 1, mb: 1, flexWrap: "wrap" }}>
           <PriorityChip priority={card.priority} size="small" />
-          <Chip
-            label={getCategoryLabel(card.category)}
-            variant="outlined"
-            size="small"
-          />
         </Box>
       </Box>
 
@@ -87,10 +82,6 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
           </Typography>
           <UserAvatar user={card.author} size={16} />
         </Box>
-
-        <Typography variant="caption" color="text.secondary">
-          {formatDate(card.createdAt)}
-        </Typography>
       </Box>
 
       {/* Métadonnées */}
@@ -119,14 +110,23 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
           )}
         </Box>
 
-        {card.assignedTo && (
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-            <Typography variant="caption" color="text.secondary">
-              Assigné à:
-            </Typography>
-            <UserAvatar user={card.assignedTo} size={16} />
-          </Box>
-        )}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+          {card.assignedTo && (
+            <>
+              <Typography variant="caption" color="text.secondary">
+                Assigné à:
+              </Typography>
+              <UserAvatar user={card.assignedTo} size={16} />
+            </>
+          )}
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ fontStyle: "italic", ml: 1 }}
+          >
+            {formatDate(card.createdAt)}
+          </Typography>
+        </Box>
       </Box>
     </Box>
   );

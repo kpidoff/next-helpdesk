@@ -128,9 +128,24 @@ export const TicketKanban: React.FC<TicketKanbanProps> = ({
               }
 
               if (newStatus) {
-                onUpdateTicket(String(source.id), {
-                  status: newStatus,
-                });
+                // Trouver le ticket original dans la liste des tickets
+                const originalTicket = tickets.find((t) => t.id === source.id);
+                if (originalTicket) {
+                  // Créer une copie du ticket avec le nouveau statut
+                  const updatedTicket = {
+                    ...originalTicket,
+                    status: newStatus,
+                    updatedAt: new Date(),
+                    // Convertir les objets User en IDs pour la compatibilité avec UpdateTicketFormData
+                    assignedTo: originalTicket.assignedTo?.id || undefined,
+                    author: originalTicket.author.id,
+                  };
+
+                  // Envoyer le ticket complet mis à jour
+                  onUpdateTicket(String(source.id), updatedTicket);
+                } else {
+                  console.warn("Could not find original ticket for update");
+                }
               } else {
                 console.warn("Could not find card in any column after move");
               }

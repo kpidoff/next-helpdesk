@@ -1,10 +1,11 @@
 import { Ticket, User } from "../../../types";
 
 import { Card as KanbanCard } from "@caldwell619/react-kanban";
+import { UpdateTicketFormData } from "@/schemas/ticket";
 
 export interface TicketKanbanProps {
   tickets: Ticket[];
-  onUpdateTicket?: (ticketId: string, data: any) => Promise<void>;
+  onUpdateTicket?: (ticketId: string, data: Partial<UpdateTicketFormData> | Ticket) => Promise<void>;
   onAddComment?: (ticketId: string, content: string, files?: File[]) => Promise<void>;
   onCloseTicket?: (ticketId: string) => Promise<void>;
   title?: string;
