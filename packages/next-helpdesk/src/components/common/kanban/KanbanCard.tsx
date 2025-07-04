@@ -1,4 +1,4 @@
-import { Box, Chip, Typography } from "@mui/material";
+import { Box, Chip, Divider, Stack, Typography } from "@mui/material";
 
 import { PriorityChip } from "../PriorityChip";
 import React from "react";
@@ -74,55 +74,84 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
           justifyContent: "space-between",
           alignItems: "center",
           mb: 1,
+          p: 1,
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-          <Typography variant="caption" color="text.secondary">
-            Créé par:
-          </Typography>
-          <UserAvatar user={card.author} size={16} />
-        </Box>
+        <Typography variant="caption" color="text.secondary">
+          Créé par
+        </Typography>
+        <UserAvatar user={card.author} size={16} />
       </Box>
 
-      {/* Métadonnées */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Box sx={{ display: "flex", gap: 1 }}>
-          {card.hoursSpent && (
-            <Typography variant="caption" color="text.secondary">
-              ⏱️ {card.hoursSpent}h
-            </Typography>
-          )}
-          {card.comments.length > 0 && (
-            <Typography variant="caption" color="text.secondary">
-              💬 {card.comments.length}
-            </Typography>
-          )}
-          {card.attachments.length > 0 && (
-            <Typography variant="caption" color="text.secondary">
-              📎 {card.attachments.length}
-            </Typography>
-          )}
-        </Box>
-
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-          {card.assignedTo && (
-            <>
+      {/* Métadonnées et assignation */}
+      <Box sx={{ mt: 2 }}>
+        {/* Assignation - Section dédiée */}
+        {card.assignedTo && (
+          <>
+            <Divider />
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 1,
+                p: 1,
+                pt: 2,
+                pb: 2,
+              }}
+            >
               <Typography variant="caption" color="text.secondary">
-                Assigné à:
+                Assigné à
               </Typography>
               <UserAvatar user={card.assignedTo} size={16} />
-            </>
-          )}
+            </Box>
+          </>
+        )}
+
+        {/* Divider */}
+        <Box sx={{ my: 1 }}>
+          <Divider />
+        </Box>
+
+        {/* Indicateurs et date */}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Box sx={{ display: "flex", gap: 1 }}>
+            {card.hoursSpent && (
+              <Chip
+                label={`⏱️ ${card.hoursSpent}h`}
+                size="small"
+                variant="outlined"
+                sx={{ fontSize: "0.7rem", height: 20 }}
+              />
+            )}
+            {card.comments.length > 0 && (
+              <Chip
+                label={`💬 ${card.comments.length}`}
+                size="small"
+                variant="outlined"
+                sx={{ fontSize: "0.7rem", height: 20 }}
+              />
+            )}
+            {card.attachments.length > 0 && (
+              <Chip
+                label={`📎 ${card.attachments.length}`}
+                size="small"
+                variant="outlined"
+                sx={{ fontSize: "0.7rem", height: 20 }}
+              />
+            )}
+          </Box>
+
           <Typography
             variant="caption"
             color="text.secondary"
-            sx={{ fontStyle: "italic", ml: 1 }}
+            sx={{ fontStyle: "italic" }}
           >
             {formatDate(card.createdAt)}
           </Typography>

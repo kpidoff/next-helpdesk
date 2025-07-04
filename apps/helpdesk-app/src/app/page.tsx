@@ -39,8 +39,8 @@ const customConfig: HelpdeskConfig = {
       statuses: [
         { value: "open", label: "Déposé", color: "primary" },
         { value: "in_progress", label: "Pris en charge", color: "warning" },
-        { value: "resolved", label: "Traité", color: "success" },
-        { value: "closed", label: "Fermé", color: "default" },
+        // { value: "resolved", label: "Traité", color: "success" },
+        // { value: "closed", label: "Fermé", color: "default" },
       ],
       defaultStatus: "open",
     },
@@ -158,23 +158,7 @@ const mockUsers: User[] = [
     role: "admin",
     // Avatar ReactNode avec badge spécial
     avatar: (
-      <Box sx={{ position: "relative" }}>
-        <Avatar sx={{ bgcolor: "error.main", width: 40, height: 40 }}>
-          ⭐
-        </Avatar>
-        <Chip
-          label="Admin"
-          size="small"
-          color="error"
-          sx={{
-            position: "absolute",
-            top: -8,
-            right: -8,
-            fontSize: "0.6rem",
-            height: 16,
-          }}
-        />
-      </Box>
+      <Avatar sx={{ bgcolor: "error.main", width: 40, height: 40 }}>⭐</Avatar>
     ),
   },
   {
@@ -354,6 +338,7 @@ const mockTickets: Ticket[] = [
     createdAt: new Date("2025-07-12"),
     updatedAt: new Date("2025-07-12"),
     author: mockUsers[4],
+    assignedTo: mockUsers[2], // Assigné à l'admin Pierre Durand
     comments: [],
     attachments: [
       {
@@ -364,6 +349,51 @@ const mockTickets: Ticket[] = [
         type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         uploadedAt: new Date("2025-07-12T10:15:00"),
         uploadedBy: mockUsers[4],
+      },
+    ],
+  },
+  {
+    id: "5",
+    title: "Problème de facturation récurrent",
+    description:
+      "Je reçois des factures en double depuis 3 mois. Pouvez-vous vérifier mon compte et corriger ce problème ?",
+    priority: "high",
+    status: "in_progress",
+    category: "billing",
+    createdAt: new Date("2025-07-10"),
+    updatedAt: new Date("2025-07-14"),
+    author: mockUsers[0],
+    assignedTo: mockUsers[1], // Assigné à l'agent Marie Martin
+    hoursSpent: 3.5,
+    startDate: new Date("2025-07-14T08:00:00"),
+    endDate: new Date("2025-07-14T11:30:00"),
+    comments: [
+      {
+        id: "6",
+        content:
+          "Je vais examiner votre historique de facturation pour identifier la cause du problème.",
+        createdAt: new Date("2025-07-14T09:00:00"),
+        author: mockUsers[1],
+        ticketId: "5",
+      },
+      {
+        id: "7",
+        content:
+          "J'ai identifié le problème. Il y a un doublon dans la configuration de facturation automatique.",
+        createdAt: new Date("2025-07-14T11:00:00"),
+        author: mockUsers[1],
+        ticketId: "5",
+      },
+    ],
+    attachments: [
+      {
+        id: "7",
+        filename: "factures-doubles.pdf",
+        url: "https://via.placeholder.com/600x800/ff6b6b/ffffff?text=Factures+Doubles",
+        size: 245760, // 240 KB
+        type: "application/pdf",
+        uploadedAt: new Date("2025-07-10T14:30:00"),
+        uploadedBy: mockUsers[0],
       },
     ],
   },

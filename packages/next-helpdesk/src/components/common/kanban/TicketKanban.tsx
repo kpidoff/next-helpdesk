@@ -103,7 +103,7 @@ export const TicketKanban: React.FC<TicketKanbanProps> = ({
           })}
       </Tabs>
 
-      <Box sx={{ height: height, overflow: "hidden" }}>
+      <Box sx={{ height: height, overflow: "auto", width: "100%" }}>
         <UncontrolledBoard
           key={selectedCategory}
           initialBoard={kanbanBoard}
