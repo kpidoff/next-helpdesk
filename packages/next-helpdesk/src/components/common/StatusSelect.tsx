@@ -73,6 +73,7 @@ export const StatusSelect: React.FC<StatusSelectProps> = ({
               return (
                 <StatusChip
                   status={selectedStatus.value}
+                  category={category}
                   size="small"
                   sx={{ fontSize: size === "small" ? "0.7rem" : "0.75rem" }}
                 />
@@ -87,6 +88,7 @@ export const StatusSelect: React.FC<StatusSelectProps> = ({
                 <Box display="flex" alignItems="center" gap={1}>
                   <StatusChip
                     status={status.value}
+                    category={category}
                     size="small"
                     sx={{ fontSize: size === "small" ? "0.7rem" : "0.75rem" }}
                   />

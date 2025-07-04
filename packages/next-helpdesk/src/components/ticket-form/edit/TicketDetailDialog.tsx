@@ -506,19 +506,17 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
 
                     {/* Auteur */}
                     <Grid item xs={12} md={6}>
-                      <Box>
+                      <Box sx={{}}>
                         <Typography
                           variant="subtitle2"
                           color="text.secondary"
                           gutterBottom
+                          sx={{ mb: 1 }}
                         >
                           Créé par
                         </Typography>
                         <Box display="flex" alignItems="center" gap={1}>
                           <UserAvatar user={ticket.author} size={24} />
-                          <Typography variant="body1">
-                            {ticket.author.name}
-                          </Typography>
                         </Box>
                       </Box>
                     </Grid>

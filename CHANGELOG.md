@@ -5,6 +5,18 @@ Tous les changements notables de ce projet seront documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [1.0.9] - 2024-12-19
+
+### Corrigé
+- **StatusSelect** : Correction de l'affichage des labels au lieu des valeurs
+  - Ajout de la prop `category` aux composants `StatusChip` dans `StatusSelect`
+  - Les statuts affichent maintenant correctement leurs labels au lieu de leurs valeurs
+  - Résolution du problème où les statuts personnalisés affichaient "OPEN" au lieu de "Ouvert"
+
+### Technique
+- Amélioration de la cohérence entre `StatusSelect` et `StatusChip`
+- Utilisation correcte des statuts spécifiques à la catégorie dans tous les composants
+
 ## [1.0.8] - 2024-12-19
 
 ### Corrigé
