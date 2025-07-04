@@ -164,8 +164,6 @@ export const TicketKanban: React.FC<TicketKanbanProps> = ({
             setSelectedTicket(null);
           }}
           ticket={selectedTicket}
-          currentUser={currentUser}
-          users={users}
           onUpdateTicket={onUpdateTicket}
           onAddComment={onAddComment}
           onCloseTicket={onCloseTicket}

@@ -59,8 +59,7 @@ interface TicketDetailDialogProps {
   open: boolean;
   onClose: () => void;
   ticket: Ticket;
-  currentUser: User;
-  users: User[];
+
   onUpdateTicket?: (
     ticketId: string,
     data: Partial<UpdateTicketFormData>
@@ -79,15 +78,13 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
   open,
   onClose,
   ticket,
-  currentUser,
-  users,
   onUpdateTicket,
   onAddComment,
   onCloseTicket,
   loading = false,
   mode = "view",
 }) => {
-  const { config } = useHelpdesk();
+  const { config, currentUser, users } = useHelpdesk();
   const [isEditing, setIsEditing] = useState(mode === "edit");
   const [chatLoading, setChatLoading] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);

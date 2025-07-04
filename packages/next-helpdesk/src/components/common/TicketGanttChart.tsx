@@ -462,8 +462,6 @@ export const TicketGanttChart: React.FC<TicketGanttChartProps> = ({
             setSelectedTicket(null);
           }}
           ticket={selectedTicket}
-          currentUser={currentUser}
-          users={users}
           onUpdateTicket={onUpdateTicket}
           onAddComment={onAddComment}
           onCloseTicket={onCloseTicket}
