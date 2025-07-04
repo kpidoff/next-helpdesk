@@ -2,7 +2,7 @@ import "gantt-task-react/dist/index.css";
 
 import { Box, Chip, Paper, Typography } from "@mui/material";
 import { Gantt, Task, ViewMode } from "gantt-task-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Ticket, User } from "../../types";
 
 import { TicketDetailDialog } from "../ticket-form/edit";
@@ -271,6 +271,17 @@ export const TicketGanttChart: React.FC<TicketGanttChartProps> = ({
   const { currentUser } = useHelpdesk();
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  // Mettre à jour le ticket sélectionné quand les tickets changent
+  useEffect(() => {
+    if (selectedTicket) {
+      const updatedTicket = tickets.find((t) => t.id === selectedTicket.id);
+      if (updatedTicket) {
+        setSelectedTicket(updatedTicket);
+      }
+    }
+  }, [tickets, selectedTicket]);
+
   // Configuration de localisation française
   const frenchLocale = "fr-FR";
 

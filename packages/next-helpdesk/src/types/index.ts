@@ -19,8 +19,8 @@ export interface Ticket {
   category: string;
   createdAt: Date;
   updatedAt: Date;
-  author: User;
-  assignedTo?: User;
+  author: Omit<User, 'role'>;
+  assignedTo?: Omit<User, 'role'>;
   comments?: Comment[];
   attachments?: Attachment[];
   hoursSpent?: number;

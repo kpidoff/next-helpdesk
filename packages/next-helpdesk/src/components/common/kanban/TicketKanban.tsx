@@ -1,7 +1,7 @@
 import "@caldwell619/react-kanban/dist/styles.css";
 
 import { Box, Paper, Tab, Tabs, Typography } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { KanbanCard } from "./KanbanCard";
 import { Ticket } from "../../../types";
@@ -35,6 +35,16 @@ export const TicketKanban: React.FC<TicketKanbanProps> = ({
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const { kanbanBoard } = useKanbanBoard(tickets, categories, selectedCategory);
+
+  // Mettre à jour le ticket sélectionné quand les tickets changent
+  useEffect(() => {
+    if (selectedTicket) {
+      const updatedTicket = tickets.find((t) => t.id === selectedTicket.id);
+      if (updatedTicket) {
+        setSelectedTicket(updatedTicket);
+      }
+    }
+  }, [tickets, selectedTicket]);
 
   // Composant personnalisé pour rendre les cartes
   const renderCard = (card: any) => {

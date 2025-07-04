@@ -44,8 +44,8 @@ import {
   getStatusesForCategory,
 } from "../../utils";
 
-import { CreateTicketFormData } from "../../schemas/ticket";
 import { TicketDetailDialog } from "../ticket-form/edit/TicketDetailDialog";
+import { UpdateTicketFormData } from "../../schemas/ticket";
 import { UserAvatar } from "../common/UserAvatar";
 import { useHelpdesk } from "../../context/HelpdeskContext";
 
@@ -56,7 +56,7 @@ interface TicketListProps {
   onDeleteTicket?: (ticket: Ticket) => void;
   onUpdateTicket?: (
     ticketId: string,
-    data: Partial<CreateTicketFormData>
+    data: Partial<UpdateTicketFormData>
   ) => Promise<void>;
   onAddComment?: (
     ticketId: string,
@@ -154,7 +154,7 @@ export const TicketList: React.FC<TicketListProps> = ({
 
   const handleUpdateTicket = async (
     ticketId: string,
-    data: Partial<CreateTicketFormData>
+    data: Partial<UpdateTicketFormData>
   ) => {
     if (onUpdateTicket) {
       setDialogLoading(true);
@@ -168,10 +168,16 @@ export const TicketList: React.FC<TicketListProps> = ({
           if (data.description) updatedTicket.description = data.description;
           if (data.category) updatedTicket.category = data.category;
           if (data.priority) updatedTicket.priority = data.priority;
+          if (data.status) updatedTicket.status = data.status;
           if (data.assignedTo) {
             const assignedUser = users.find((u) => u.id === data.assignedTo);
             updatedTicket.assignedTo = assignedUser;
           }
+          // Gestion du temps
+          if (data.hoursSpent !== undefined)
+            updatedTicket.hoursSpent = data.hoursSpent;
+          if (data.startDate) updatedTicket.startDate = data.startDate;
+          if (data.endDate) updatedTicket.endDate = data.endDate;
           return updatedTicket;
         });
       } finally {
@@ -189,7 +195,13 @@ export const TicketList: React.FC<TicketListProps> = ({
       setDialogLoading(true);
       try {
         await onAddComment(ticketId, content, files);
-        // Optionnel : mettre à jour les commentaires localement
+        // Mettre à jour le ticket sélectionné avec les nouveaux commentaires
+        setSelectedTicket((prev) => {
+          if (!prev || prev.id !== ticketId) return prev;
+          // Trouver le ticket mis à jour dans la liste
+          const updatedTicket = tickets.find((t) => t.id === ticketId);
+          return updatedTicket || prev;
+        });
       } finally {
         setDialogLoading(false);
       }

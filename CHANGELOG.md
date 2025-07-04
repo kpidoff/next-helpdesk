@@ -5,6 +5,18 @@ Tous les changements notables de ce projet seront documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [1.0.5] - 2024-12-19
+
+### Corrigé
+- **TicketList** : Correction du type TypeScript pour la mise à jour des tickets
+  - Changement de `CreateTicketFormData` vers `UpdateTicketFormData` dans l'interface
+  - Ajout de la gestion complète des champs `status`, `hoursSpent`, `startDate` et `endDate` dans `handleUpdateTicket`
+  - Résolution du problème où les modifications de statut et de suivi du temps n'étaient pas transmises
+
+### Amélioré
+- Mise à jour locale complète des tickets après modification
+- Meilleure cohérence des types entre les composants
+
 ## [1.0.4] - 2024-12-19
 
 ### Corrigé

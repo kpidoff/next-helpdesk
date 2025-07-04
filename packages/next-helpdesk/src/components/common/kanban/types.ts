@@ -15,8 +15,8 @@ export interface TicketKanbanProps {
 export interface TicketCard extends KanbanCard {
   priority: string;
   category: string;
-  author: User;
-  assignedTo?: User;
+  author: Omit<User, "role">;
+  assignedTo?: Omit<User, "role">;
   createdAt: Date;
   updatedAt: Date;
   hoursSpent?: number;

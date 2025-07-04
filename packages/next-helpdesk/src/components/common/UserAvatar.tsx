@@ -4,7 +4,7 @@ import React from "react";
 import { User } from "../../types";
 
 export interface UserAvatarProps extends Omit<AvatarProps, "src" | "alt"> {
-  user: User;
+  user: Omit<User, "role">;
   size?: number;
 }
 
