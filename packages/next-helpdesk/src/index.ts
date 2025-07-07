@@ -9,7 +9,7 @@ export { TicketDetailDialog } from './components/ticket-form';
 export { TicketChat } from './components/ticket-form';
 
 // Composants communs
-export { UserAvatar, UserSelect, StatusSelect, StatusChip, PrioritySelect, PriorityChip, TimeTrackingFields, TicketGanttChart, TicketKanban } from './components/common';
+export { UserAvatar, UserSelect, StatusSelect, StatusChip, TagChip, TagSelect, PrioritySelect, PriorityChip, TimeTrackingFields, TicketGanttChart, TicketKanban } from './components/common';
 
 // Contexte et hooks
 export { HelpdeskProvider, useHelpdesk } from './context/HelpdeskContext';

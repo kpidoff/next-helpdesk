@@ -545,6 +545,8 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
                         return null; // Ne pas afficher la section tags
                       }
 
+                      const configTags = getTagsForCategory(selectedCategory);
+
                       return (
                         <Grid item xs={12}>
                           {isEditing ? (
@@ -572,7 +574,15 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
                                 value={
                                   ticket.tags && ticket.tags.length > 0
                                     ? ticket.tags
-                                        .map((tag) => tag.label)
+                                        .map((ticketTag) => {
+                                          // Récupérer les informations les plus récentes du tag depuis la configuration
+                                          const configTag = configTags.find(
+                                            (tag) => tag.id === ticketTag.id
+                                          );
+                                          return configTag
+                                            ? configTag.label
+                                            : ticketTag.label;
+                                        })
                                         .join(", ")
                                     : "Aucun tag"
                                 }
@@ -598,16 +608,26 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
                                 }}
                               >
                                 {ticket.tags && ticket.tags.length > 0 ? (
-                                  ticket.tags.map((tag) => (
-                                    <TagChip
-                                      key={tag.id}
-                                      tag={tag}
-                                      size="small"
-                                      category={selectedCategory}
-                                      deletable={true}
-                                      globalDelete={true}
-                                    />
-                                  ))
+                                  ticket.tags.map((ticketTag) => {
+                                    // Récupérer les informations les plus récentes du tag depuis la configuration
+                                    const configTag = configTags.find(
+                                      (tag) => tag.id === ticketTag.id
+                                    );
+
+                                    // Utiliser les données de la configuration si disponibles, sinon celles du ticket
+                                    const displayTag = configTag || ticketTag;
+
+                                    return (
+                                      <TagChip
+                                        key={displayTag.id}
+                                        tag={displayTag}
+                                        size="small"
+                                        category={selectedCategory}
+                                        deletable={true}
+                                        globalDelete={true}
+                                      />
+                                    );
+                                  })
                                 ) : (
                                   <Typography
                                     variant="body2"

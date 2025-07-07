@@ -5,6 +5,13 @@ Tous les changements notables de ce projet seront documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [1.3.5] - 2024-12-19
+
+### Corrigé
+- **Exports** : Ajout de `TagChip` et `TagSelect` dans les exports principaux
+  - `TagChip` et `TagSelect` sont maintenant disponibles pour l'import direct depuis `@next-helpdesk/core`
+  - Correction de l'export manquant qui empêchait l'utilisation de ces composants
+
 ## [1.3.4] - 2024-12-19
 
 ### Corrigé
