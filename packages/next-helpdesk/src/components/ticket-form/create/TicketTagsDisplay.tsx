@@ -12,6 +12,12 @@ export const TicketTagsDisplay: React.FC<TicketTagsDisplayProps> = ({
   category,
 }) => {
   const { getTagsForCategory } = useHelpdesk();
+
+  // Vérifier si la fonction de gestion des tags est disponible
+  if (!getTagsForCategory) {
+    return null; // Ne pas afficher le composant si la fonction n'est pas disponible
+  }
+
   const availableTags = getTagsForCategory(category);
 
   if (availableTags.length === 0) {

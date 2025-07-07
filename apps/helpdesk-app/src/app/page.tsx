@@ -619,30 +619,39 @@ export default function Home() {
     alert("Ticket clôturé avec succès !");
   };
 
-  // Callback pour la suppression de tags
+  // Gestion de la suppression de tags
   const handleTagRemoved = async (category: string, tagValue: string) => {
     console.log("🗑️ Suppression de tag:", { category, tagValue });
 
-    try {
-      // Ici vous pouvez ajouter votre logique de suppression en base de données
-      // Par exemple :
-      // await fetch('/api/tags', {
-      //   method: 'DELETE',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ category, tagValue })
-      // });
+    // Ici vous pouvez ajouter votre logique de suppression en base de données
+    // Par exemple :
+    // await fetch('/api/tags', {
+    //   method: 'DELETE',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({ category, tagValue })
+    // });
 
-      console.log(
-        `✅ Tag "${tagValue}" supprimé de la catégorie "${category}"`
-      );
+    console.log(`✅ Tag "${tagValue}" supprimé de la catégorie "${category}"`);
+  };
 
-      // Optionnel : notifier l'utilisateur
-      // alert(`Tag "${tagValue}" supprimé avec succès !`);
-    } catch (error) {
-      console.error("❌ Erreur lors de la suppression du tag:", error);
-      // Optionnel : notifier l'erreur à l'utilisateur
-      // alert("Erreur lors de la suppression du tag");
-    }
+  // Gestion de l'ajout de tags
+  const handleTagAdded = async (category: string, tag: any) => {
+    console.log("➕ Ajout de tag:", { category, tag });
+
+    // Ici vous pouvez ajouter votre logique d'ajout en base de données
+    // Par exemple :
+    // await fetch('/api/tags', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({
+    //     category,
+    //     value: tag.value,
+    //     label: tag.label,
+    //     color: tag.color
+    //   })
+    // });
+
+    console.log(`✅ Tag "${tag.label}" ajouté à la catégorie "${category}"`);
   };
 
   return (
@@ -651,6 +660,7 @@ export default function Home() {
       userRole={currentUser.role}
       currentUser={currentUser}
       users={mockUsers}
+      onTagAdded={handleTagAdded}
       onTagRemoved={handleTagRemoved}
     >
       <Container maxWidth="lg" sx={{ py: 4 }}>

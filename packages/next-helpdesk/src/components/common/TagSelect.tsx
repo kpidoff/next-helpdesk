@@ -44,6 +44,11 @@ export const TagSelect: React.FC<TagSelectProps> = ({
     isAdmin,
     removeTagFromCategory,
   } = useHelpdesk();
+
+  // Vérifier si les fonctions de gestion des tags sont disponibles
+  if (!getTagsForCategory || !addTagToCategory) {
+    return null; // Ne pas afficher le composant si les fonctions ne sont pas disponibles
+  }
   const [inputValue, setInputValue] = useState("");
 
   const availableTags = getTagsForCategory(category).filter(

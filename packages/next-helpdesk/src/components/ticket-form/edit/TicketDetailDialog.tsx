@@ -508,75 +508,91 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
                       </Grid>
                     )}
 
-                    {/* Tags */}
-                    <Grid item xs={12}>
-                      {isEditing ? (
-                        currentUser.role === "admin" ||
-                        currentUser.role === "agent" ? (
-                          <Controller
-                            name="tags"
-                            control={control}
-                            render={({ field }) => (
-                              <TagSelect
-                                category={selectedCategory}
-                                value={field.value || []}
-                                onChange={field.onChange}
-                                label="Tags"
-                                placeholder="Sélectionner ou créer des tags..."
-                                error={!!errors.tags}
-                                helperText={errors.tags?.message}
-                                deletable={true}
+                    {/* Tags - Affiché seulement si les fonctions de gestion sont disponibles */}
+                    {(() => {
+                      const { getTagsForCategory, addTagToCategory } =
+                        useHelpdesk();
+                      if (!getTagsForCategory || !addTagToCategory) {
+                        return null; // Ne pas afficher la section tags
+                      }
+
+                      return (
+                        <Grid item xs={12}>
+                          {isEditing ? (
+                            currentUser.role === "admin" ||
+                            currentUser.role === "agent" ? (
+                              <Controller
+                                name="tags"
+                                control={control}
+                                render={({ field }) => (
+                                  <TagSelect
+                                    category={selectedCategory}
+                                    value={field.value || []}
+                                    onChange={field.onChange}
+                                    label="Tags"
+                                    placeholder="Sélectionner ou créer des tags..."
+                                    error={!!errors.tags}
+                                    helperText={errors.tags?.message}
+                                    deletable={true}
+                                  />
+                                )}
                               />
-                            )}
-                          />
-                        ) : (
-                          <TextField
-                            label="Tags"
-                            value={
-                              ticket.tags && ticket.tags.length > 0
-                                ? ticket.tags.map((tag) => tag.label).join(", ")
-                                : "Aucun tag"
-                            }
-                            fullWidth
-                            disabled
-                            helperText="Seuls les agents et admins peuvent modifier les tags"
-                          />
-                        )
-                      ) : (
-                        <Box>
-                          <Typography
-                            variant="subtitle2"
-                            color="text.secondary"
-                            gutterBottom
-                          >
-                            Tags
-                          </Typography>
-                          <Box
-                            sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}
-                          >
-                            {ticket.tags && ticket.tags.length > 0 ? (
-                              ticket.tags.map((tag) => (
-                                <TagChip
-                                  key={tag.value}
-                                  tag={tag}
-                                  size="small"
-                                  category={selectedCategory}
-                                  deletable={true}
-                                  globalDelete={true}
-                                />
-                              ))
                             ) : (
+                              <TextField
+                                label="Tags"
+                                value={
+                                  ticket.tags && ticket.tags.length > 0
+                                    ? ticket.tags
+                                        .map((tag) => tag.label)
+                                        .join(", ")
+                                    : "Aucun tag"
+                                }
+                                fullWidth
+                                disabled
+                                helperText="Seuls les agents et admins peuvent modifier les tags"
+                              />
+                            )
+                          ) : (
+                            <Box>
                               <Typography
-                                variant="body2"
+                                variant="subtitle2"
                                 color="text.secondary"
+                                gutterBottom
                               >
-                                Aucun tag
+                                Tags
                               </Typography>
-                            )}
-                          </Box>
-                        </Box>
-                      )}
-                    </Grid>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  gap: 1,
+                                  flexWrap: "wrap",
+                                }}
+                              >
+                                {ticket.tags && ticket.tags.length > 0 ? (
+                                  ticket.tags.map((tag) => (
+                                    <TagChip
+                                      key={tag.value}
+                                      tag={tag}
+                                      size="small"
+                                      category={selectedCategory}
+                                      deletable={true}
+                                      globalDelete={true}
+                                    />
+                                  ))
+                                ) : (
+                                  <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                  >
+                                    Aucun tag
+                                  </Typography>
+                                )}
+                              </Box>
+                            </Box>
+                          )}
+                        </Grid>
+                      );
+                    })()}
 
                     {/* Auteur */}
                     <Grid item xs={12} md={6}>

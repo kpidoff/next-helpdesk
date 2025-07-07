@@ -194,6 +194,7 @@ interface HelpdeskProviderProps {
   userRole?: UserRole;
   currentUser: User;
   users: User[];
+  onTagAdded?: (category: string, tag: TagConfig) => void;
   onTagRemoved?: (category: string, tagValue: string) => void;
 }
 
@@ -203,6 +204,7 @@ export const HelpdeskProvider: React.FC<HelpdeskProviderProps> = ({
   userRole = "user",
   currentUser: initialUser,
   users: initialUsers,
+  onTagAdded,
   onTagRemoved,
 }) => {
   const [config, setConfig] = React.useState<HelpdeskConfig>({
@@ -264,11 +266,21 @@ export const HelpdeskProvider: React.FC<HelpdeskProviderProps> = ({
 
   // Fonction pour ajouter un tag à une catégorie
   const addTagToCategory = React.useCallback(
-    (
+    async (
       category: string,
       tag: TagConfig,
-      onTagAdded?: (category: string, tag: TagConfig) => void
+      callback?: (category: string, tag: TagConfig) => void
     ) => {
+      // Appeler le callback global si fourni (pour la gestion côté client)
+      if (onTagAdded) {
+        try {
+          await onTagAdded(category, tag);
+        } catch (error) {
+          console.error("Erreur lors de l'ajout du tag:", error);
+          throw error; // Propager l'erreur
+        }
+      }
+
       setConfig((prevConfig) => {
         const updatedCategories = prevConfig.categories.map((cat) => {
           if (cat.value === category) {
@@ -277,9 +289,9 @@ export const HelpdeskProvider: React.FC<HelpdeskProviderProps> = ({
             const tagExists = existingTags.some((t) => t.value === tag.value);
             if (!tagExists) {
               const updatedTags = [...existingTags, tag];
-              // Appeler le callback si fourni
-              if (onTagAdded) {
-                onTagAdded(category, tag);
+              // Appeler le callback local si fourni
+              if (callback) {
+                callback(category, tag);
               }
               return { ...cat, tags: updatedTags };
             }
@@ -289,16 +301,26 @@ export const HelpdeskProvider: React.FC<HelpdeskProviderProps> = ({
         return { ...prevConfig, categories: updatedCategories };
       });
     },
-    []
+    [onTagAdded]
   );
 
   // Fonction pour supprimer un tag d'une catégorie
   const removeTagFromCategory = React.useCallback(
-    (
+    async (
       category: string,
       tagValue: string,
       callback?: (category: string, tagValue: string) => void
     ) => {
+      // Appeler le callback global si fourni (pour la gestion côté client)
+      if (onTagRemoved) {
+        try {
+          await onTagRemoved(category, tagValue);
+        } catch (error) {
+          console.error("Erreur lors de la suppression du tag:", error);
+          throw error; // Propager l'erreur
+        }
+      }
+
       setConfig((prevConfig) => {
         const updatedCategories = prevConfig.categories.map((cat) => {
           if (cat.value === category) {
@@ -306,13 +328,9 @@ export const HelpdeskProvider: React.FC<HelpdeskProviderProps> = ({
             const updatedTags = existingTags.filter(
               (t) => t.value !== tagValue
             );
-            // Appeler le callback si fourni
+            // Appeler le callback local si fourni
             if (callback) {
               callback(category, tagValue);
-            }
-            // Appeler le callback global si fourni
-            if (onTagRemoved) {
-              onTagRemoved(category, tagValue);
             }
             return { ...cat, tags: updatedTags };
           }
@@ -321,7 +339,7 @@ export const HelpdeskProvider: React.FC<HelpdeskProviderProps> = ({
         return { ...prevConfig, categories: updatedCategories };
       });
     },
-    []
+    [onTagRemoved]
   );
 
   const value: HelpdeskContextType = {

@@ -27,6 +27,14 @@ export const TagChip: React.FC<TagChipProps> = ({
 }) => {
   const { isAdmin, removeTagFromCategory } = useHelpdesk();
 
+  // Vérifier si la fonction de suppression est disponible pour la suppression globale
+  if (globalDelete && !removeTagFromCategory) {
+    // Si on veut une suppression globale mais que la fonction n'est pas disponible,
+    // on désactive la suppression
+    deletable = false;
+    globalDelete = false;
+  }
+
   const label = showValue ? `${tag.value}: ${tag.label}` : tag.label;
 
   const handleDelete = () => {
