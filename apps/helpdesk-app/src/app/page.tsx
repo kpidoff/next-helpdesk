@@ -546,30 +546,29 @@ export default function Home() {
   ) => {
     console.log("✏️ Mise à jour du ticket:", ticketId, data);
 
+    // Créer l'objet de mise à jour avec seulement les champs modifiés
+    const updateData: Partial<Ticket> = {
+      updatedAt: new Date(),
+    };
+
+    if (data.title !== undefined) updateData.title = data.title;
+    if (data.description !== undefined)
+      updateData.description = data.description;
+    if (data.category !== undefined) updateData.category = data.category;
+    if (data.priority !== undefined) updateData.priority = data.priority;
+    if (data.status !== undefined) updateData.status = data.status;
+    if (data.assignedTo !== undefined) {
+      const assignedUser = mockUsers.find((u) => u.id === data.assignedTo);
+      updateData.assignedTo = assignedUser;
+    }
+    if (data.hoursSpent !== undefined) updateData.hoursSpent = data.hoursSpent;
+    if (data.startDate !== undefined) updateData.startDate = data.startDate;
+    if (data.endDate !== undefined) updateData.endDate = data.endDate;
+
     setTickets((prev) =>
       prev.map((ticket) => {
         if (ticket.id === ticketId) {
-          const updatedTicket = { ...ticket };
-
-          if (data.title) updatedTicket.title = data.title;
-          if (data.description) updatedTicket.description = data.description;
-          if (data.category) updatedTicket.category = data.category;
-          if (data.priority) updatedTicket.priority = data.priority;
-          if (data.status) updatedTicket.status = data.status;
-          if (data.assignedTo) {
-            const assignedUser = mockUsers.find(
-              (u) => u.id === data.assignedTo
-            );
-            updatedTicket.assignedTo = assignedUser;
-          }
-          // Gestion du temps
-          if (data.hoursSpent !== undefined)
-            updatedTicket.hoursSpent = data.hoursSpent;
-          if (data.startDate) updatedTicket.startDate = data.startDate;
-          if (data.endDate) updatedTicket.endDate = data.endDate;
-
-          updatedTicket.updatedAt = new Date();
-          return updatedTicket;
+          return { ...ticket, ...updateData };
         }
         return ticket;
       })

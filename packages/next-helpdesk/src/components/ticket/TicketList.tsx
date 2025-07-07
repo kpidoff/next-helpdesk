@@ -160,7 +160,7 @@ export const TicketList: React.FC<TicketListProps> = ({
       setDialogLoading(true);
       try {
         await onUpdateTicket(ticketId, data);
-        // Mettre à jour le ticket localement si nécessaire
+        // Mettre à jour le ticket localement avec les nouvelles données
         setSelectedTicket((prev) => {
           if (!prev) return null;
           const updatedTicket = { ...prev };
@@ -178,6 +178,7 @@ export const TicketList: React.FC<TicketListProps> = ({
             updatedTicket.hoursSpent = data.hoursSpent;
           if (data.startDate) updatedTicket.startDate = data.startDate;
           if (data.endDate) updatedTicket.endDate = data.endDate;
+          updatedTicket.updatedAt = new Date();
           return updatedTicket;
         });
       } finally {

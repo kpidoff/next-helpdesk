@@ -5,6 +5,29 @@ Tous les changements notables de ce projet seront documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [1.3.4] - 2024-12-19
+
+### Corrigé
+- **TicketDetailDialog** : Correction du problème de flash lors de la sauvegarde des tickets
+  - Le `useEffect` ne réinitialise plus le formulaire si l'utilisateur est en train d'éditer
+  - Utilisation de `useMemo` pour mémoriser les valeurs par défaut et éviter les recalculs inutiles
+  - Réinitialisation explicite du formulaire avec les nouvelles données après la sauvegarde
+  - Élimination du "flash" où les anciennes données s'affichaient brièvement avant les nouvelles
+
+### Amélioré
+- **TicketList** : Optimisation de la mise à jour locale du ticket sélectionné
+  - Ajout de `updatedAt` dans la mise à jour locale pour une meilleure cohérence
+  - Amélioration de la gestion d'état pour éviter les re-renders inutiles
+
+- **Page principale** : Optimisation de la fonction `handleUpdateTicket`
+  - Création d'un objet de mise à jour optimisé avec seulement les champs modifiés
+  - Réduction des mises à jour d'état inutiles
+
+### Technique
+- Amélioration des performances avec moins de re-renders
+- Code optimisé avec `useMemo` et mises à jour conditionnelles
+- Meilleure expérience utilisateur avec des transitions fluides
+
 ## [1.0.9] - 2024-12-19
 
 ### Corrigé

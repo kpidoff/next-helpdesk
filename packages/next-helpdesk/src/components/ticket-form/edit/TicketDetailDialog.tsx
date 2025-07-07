@@ -38,7 +38,7 @@ import {
   UserAvatar,
   UserSelect,
 } from "../../common";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   UpdateTicketFormData,
   updateTicketSchema,
@@ -121,9 +121,9 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
 
   const selectedCategory = watch("category");
 
-  // Réinitialiser le formulaire quand le ticket change
-  useEffect(() => {
-    reset({
+  // Mémoriser les valeurs par défaut pour éviter les recalculs inutiles
+  const defaultValues = useMemo(
+    () => ({
       title: ticket.title,
       description: ticket.description,
       category: ticket.category,
@@ -135,8 +135,16 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
       hoursSpent: ticket.hoursSpent || 0,
       startDate: ticket.startDate ? new Date(ticket.startDate) : undefined,
       endDate: ticket.endDate ? new Date(ticket.endDate) : undefined,
-    });
-  }, [ticket, reset]);
+    }),
+    [ticket]
+  );
+
+  // Réinitialiser le formulaire quand le ticket change, mais seulement si on n'est pas en train d'éditer
+  useEffect(() => {
+    if (!isEditing) {
+      reset(defaultValues);
+    }
+  }, [defaultValues, reset, isEditing]);
 
   const handleSave = async (data: UpdateTicketFormData) => {
     if (onUpdateTicket) {
@@ -144,6 +152,27 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
       try {
         await onUpdateTicket(ticket.id, data);
         setIsEditing(false);
+        // Réinitialiser le formulaire avec les nouvelles données après la sauvegarde
+        reset({
+          title: data.title || ticket.title,
+          description: data.description || ticket.description,
+          category: data.category || ticket.category,
+          priority: data.priority || ticket.priority,
+          status: data.status || ticket.status,
+          assignedTo: data.assignedTo || ticket.assignedTo?.id || "",
+          tags: data.tags || ticket.tags || [],
+          files: [],
+          hoursSpent:
+            data.hoursSpent !== undefined
+              ? data.hoursSpent
+              : ticket.hoursSpent || 0,
+          startDate:
+            data.startDate ||
+            (ticket.startDate ? new Date(ticket.startDate) : undefined),
+          endDate:
+            data.endDate ||
+            (ticket.endDate ? new Date(ticket.endDate) : undefined),
+        });
       } finally {
         setUpdateLoading(false);
       }
