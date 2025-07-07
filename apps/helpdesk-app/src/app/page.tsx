@@ -656,38 +656,51 @@ export default function Home() {
   };
 
   // Gestion de la suppression de tags
-  const handleTagRemoved = async (category: string, tagValue: string) => {
-    console.log("🗑️ Suppression de tag:", { category, tagValue });
+  const handleTagRemoved = async (category: string, tagId: string) => {
+    console.log("🗑️ Suppression de tag:", { category, tagId });
 
     // Ici vous pouvez ajouter votre logique de suppression en base de données
     // Par exemple :
     // await fetch('/api/tags', {
     //   method: 'DELETE',
     //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ category, tagValue })
+    //   body: JSON.stringify({ category, tagId })
     // });
 
-    console.log(`✅ Tag "${tagValue}" supprimé de la catégorie "${category}"`);
+    console.log(`✅ Tag "${tagId}" supprimé de la catégorie "${category}"`);
   };
 
   // Gestion de l'ajout de tags
-  const handleTagAdded = async (category: string, tag: any) => {
+  const handleTagAdded = async (category: string, tag: any): Promise<any> => {
     console.log("➕ Ajout de tag:", { category, tag });
 
     // Ici vous pouvez ajouter votre logique d'ajout en base de données
     // Par exemple :
-    // await fetch('/api/tags', {
+    // const response = await fetch('/api/tags', {
     //   method: 'POST',
     //   headers: { 'Content-Type': 'application/json' },
     //   body: JSON.stringify({
     //     category,
-    //     value: tag.value,
     //     label: tag.label,
     //     color: tag.color
     //   })
     // });
+    // const savedTag = await response.json();
 
-    console.log(`✅ Tag "${tag.label}" ajouté à la catégorie "${category}"`);
+    // Simuler un délai d'ajout en base
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // Retourner le tag avec l'ID généré par le serveur
+    const savedTag = {
+      id: `tag_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      label: tag.label,
+      color: tag.color,
+    };
+
+    console.log(
+      `✅ Tag "${tag.label}" ajouté à la catégorie "${category}" avec l'ID: ${savedTag.id}`
+    );
+    return savedTag;
   };
 
   return (

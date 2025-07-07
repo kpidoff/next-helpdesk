@@ -72,13 +72,13 @@ export interface HelpdeskContextType {
   addTagToCategory: (
     category: string,
     tag: TagConfig,
-    onTagAdded?: (category: string, tag: TagConfig) => void
-  ) => void;
+    onTagAdded?: (category: string, tag: TagConfig) => Promise<TagConfig>
+  ) => Promise<TagConfig>;
   removeTagFromCategory: (
     category: string,
-    tagValue: string,
-    onTagRemoved?: (category: string, tagValue: string) => void
-  ) => void;
+    tagId: string,
+    onTagRemoved?: (category: string, tagId: string) => Promise<void>
+  ) => Promise<void>;
 }
 
 const defaultConfig: HelpdeskConfig = {
@@ -187,8 +187,8 @@ interface HelpdeskProviderProps {
   userRole?: UserRole;
   currentUser: User;
   users: User[];
-  onTagAdded?: (category: string, tag: TagConfig) => void;
-  onTagRemoved?: (category: string, tagValue: string) => void;
+  onTagAdded?: (category: string, tag: TagConfig) => Promise<TagConfig>;
+  onTagRemoved?: (category: string, tagId: string) => Promise<void>;
 }
 
 export const HelpdeskProvider: React.FC<HelpdeskProviderProps> = ({
@@ -262,12 +262,14 @@ export const HelpdeskProvider: React.FC<HelpdeskProviderProps> = ({
     async (
       category: string,
       tag: TagConfig,
-      callback?: (category: string, tag: TagConfig) => void
-    ) => {
+      callback?: (category: string, tag: TagConfig) => Promise<TagConfig>
+    ): Promise<TagConfig> => {
+      let finalTag = tag;
+
       // Appeler le callback global si fourni (pour la gestion côté client)
       if (onTagAdded) {
         try {
-          await onTagAdded(category, tag);
+          finalTag = await onTagAdded(category, tag);
         } catch (error) {
           console.error("Erreur lors de l'ajout du tag:", error);
           throw error; // Propager l'erreur
@@ -279,12 +281,12 @@ export const HelpdeskProvider: React.FC<HelpdeskProviderProps> = ({
           if (cat.value === category) {
             const existingTags = cat.tags || [];
             // Vérifier si le tag existe déjà
-            const tagExists = existingTags.some((t) => t.id === tag.id);
+            const tagExists = existingTags.some((t) => t.id === finalTag.id);
             if (!tagExists) {
-              const updatedTags = [...existingTags, tag];
+              const updatedTags = [...existingTags, finalTag];
               // Appeler le callback local si fourni
               if (callback) {
-                callback(category, tag);
+                callback(category, finalTag);
               }
               return { ...cat, tags: updatedTags };
             }
@@ -293,6 +295,8 @@ export const HelpdeskProvider: React.FC<HelpdeskProviderProps> = ({
         });
         return { ...prevConfig, categories: updatedCategories };
       });
+
+      return finalTag;
     },
     [onTagAdded]
   );
@@ -301,13 +305,13 @@ export const HelpdeskProvider: React.FC<HelpdeskProviderProps> = ({
   const removeTagFromCategory = React.useCallback(
     async (
       category: string,
-      tagValue: string,
-      callback?: (category: string, tagValue: string) => void
-    ) => {
+      tagId: string,
+      callback?: (category: string, tagId: string) => Promise<void>
+    ): Promise<void> => {
       // Appeler le callback global si fourni (pour la gestion côté client)
       if (onTagRemoved) {
         try {
-          await onTagRemoved(category, tagValue);
+          await onTagRemoved(category, tagId);
         } catch (error) {
           console.error("Erreur lors de la suppression du tag:", error);
           throw error; // Propager l'erreur
@@ -318,10 +322,10 @@ export const HelpdeskProvider: React.FC<HelpdeskProviderProps> = ({
         const updatedCategories = prevConfig.categories.map((cat) => {
           if (cat.value === category) {
             const existingTags = cat.tags || [];
-            const updatedTags = existingTags.filter((t) => t.id !== tagValue);
+            const updatedTags = existingTags.filter((t) => t.id !== tagId);
             // Appeler le callback local si fourni
             if (callback) {
-              callback(category, tagValue);
+              callback(category, tagId);
             }
             return { ...cat, tags: updatedTags };
           }

@@ -28,7 +28,7 @@ interface TagSelectProps {
   helperText?: string;
   disabled?: boolean;
   deletable?: boolean;
-  onTagAdded?: (category: string, tag: TagConfig) => void;
+  onTagAdded?: (category: string, tag: TagConfig) => Promise<TagConfig>;
 }
 
 export const TagSelect: React.FC<TagSelectProps> = ({
@@ -76,16 +76,17 @@ export const TagSelect: React.FC<TagSelectProps> = ({
     if (!newTagData) return;
 
     const newTag: TagConfig = {
-      id: `tag_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`, // ID temporaire
       label: newTagData.label,
       color: newTagData.color,
     };
 
     try {
-      await addTagToCategory(category, newTag, onTagAdded);
+      // Le serveur retourne le tag avec l'ID final
+      const finalTag = await addTagToCategory(category, newTag, onTagAdded);
 
-      // Ajouter le tag à la liste sélectionnée
-      const updatedTags = [...value, newTag];
+      // Ajouter le tag avec l'ID du serveur à la liste sélectionnée
+      const updatedTags = [...value, finalTag];
       onChange(updatedTags);
 
       // Fermer le dialog
