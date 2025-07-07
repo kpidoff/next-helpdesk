@@ -20,7 +20,7 @@ export const createTicketSchema = z.object({
     .optional(),
   tags: z
     .array(z.object({
-      value: z.string(),
+      id: z.string(),
       label: z.string(),
       color: z.string().optional(), // Support des couleurs hexadécimales
     }))

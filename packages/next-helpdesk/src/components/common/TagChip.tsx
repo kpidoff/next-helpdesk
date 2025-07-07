@@ -35,15 +35,15 @@ export const TagChip: React.FC<TagChipProps> = ({
     globalDelete = false;
   }
 
-  const label = showValue ? `${tag.value}: ${tag.label}` : tag.label;
+  const label = showValue ? `${tag.id}: ${tag.label}` : tag.label;
 
   const handleDelete = () => {
     if (onDelete) {
       // Suppression locale (dans le formulaire)
-      onDelete(tag.value);
+      onDelete(tag.id);
     } else if (globalDelete && category && isAdmin) {
       // Suppression globale (de la base de données)
-      removeTagFromCategory(category, tag.value);
+      removeTagFromCategory(category, tag.id);
     }
   };
 

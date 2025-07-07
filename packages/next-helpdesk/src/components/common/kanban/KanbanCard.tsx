@@ -65,7 +65,7 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
           <Box sx={{ display: "flex", gap: 0.5, mb: 1, flexWrap: "wrap" }}>
             {card.tags.slice(0, 3).map((tag) => (
               <TagChip
-                key={tag.value}
+                key={tag.id}
                 tag={tag}
                 size="small"
                 category={card.category}

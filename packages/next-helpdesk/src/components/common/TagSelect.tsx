@@ -62,7 +62,7 @@ export const TagSelect: React.FC<TagSelectProps> = ({
   } | null>(null);
 
   const availableTags = getTagsForCategory(category).filter(
-    (tag) => !value.some((selectedTag) => selectedTag.value === tag.value)
+    (tag) => !value.some((selectedTag) => selectedTag.id === tag.id)
   );
 
   const handleCreateTag = (tagValue: string) => {
@@ -76,7 +76,7 @@ export const TagSelect: React.FC<TagSelectProps> = ({
     if (!newTagData) return;
 
     const newTag: TagConfig = {
-      value: newTagData.label.toLowerCase().replace(/\s+/g, "_"),
+      id: `tag_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       label: newTagData.label,
       color: newTagData.color,
     };
@@ -121,9 +121,9 @@ export const TagSelect: React.FC<TagSelectProps> = ({
     onChange(processedTags);
   };
 
-  const handleDeleteTag = (tagValue: string) => {
+  const handleDeleteTag = (tagId: string) => {
     // Supprimer le tag de la liste locale
-    const updatedTags = value.filter((tag) => tag.value !== tagValue);
+    const updatedTags = value.filter((tag) => tag.id !== tagId);
     onChange(updatedTags);
   };
 
@@ -160,7 +160,7 @@ export const TagSelect: React.FC<TagSelectProps> = ({
               <TagChip
                 tag={
                   typeof option === "string"
-                    ? { value: option, label: option, color: "default" }
+                    ? { id: `temp_${option}`, label: option, color: "default" }
                     : option
                 }
                 size="small"
@@ -204,7 +204,7 @@ export const TagSelect: React.FC<TagSelectProps> = ({
                 size="small"
                 onClick={(e) => {
                   e.stopPropagation();
-                  removeTagFromCategory(category, option.value);
+                  removeTagFromCategory(category, option.id);
                 }}
                 sx={{ ml: 1 }}
               >

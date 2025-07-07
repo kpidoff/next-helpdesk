@@ -571,7 +571,7 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
                                 {ticket.tags && ticket.tags.length > 0 ? (
                                   ticket.tags.map((tag) => (
                                     <TagChip
-                                      key={tag.value}
+                                      key={tag.id}
                                       tag={tag}
                                       size="small"
                                       category={selectedCategory}

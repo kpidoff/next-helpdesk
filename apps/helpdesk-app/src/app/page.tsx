@@ -44,10 +44,22 @@ const customConfig: HelpdeskConfig = {
       ],
       defaultStatus: "open",
       tags: [
-        { value: "urgent", label: "Urgent", color: "#d32f2f" },
-        { value: "bug", label: "Bug", color: "#f44336" },
-        { value: "connexion", label: "Connexion", color: "#1976d2" },
-        { value: "performance", label: "Performance", color: "#ed6c02" },
+        {
+          id: "tag_urgent",
+          label: "Urgent",
+          color: "#d32f2f",
+        },
+        { id: "tag_bug", label: "Bug", color: "#f44336" },
+        {
+          id: "tag_connexion",
+          label: "Connexion",
+          color: "#1976d2",
+        },
+        {
+          id: "tag_performance",
+          label: "Performance",
+          color: "#ed6c02",
+        },
       ],
     },
     {
@@ -61,9 +73,21 @@ const customConfig: HelpdeskConfig = {
       ],
       defaultStatus: "open",
       tags: [
-        { value: "remboursement", label: "Remboursement", color: "#ed6c02" },
-        { value: "facturation", label: "Facturation", color: "#9c27b0" },
-        { value: "paiement", label: "Paiement", color: "#0288d1" },
+        {
+          id: "tag_remboursement",
+          label: "Remboursement",
+          color: "#ed6c02",
+        },
+        {
+          id: "tag_facturation",
+          label: "Facturation",
+          color: "#9c27b0",
+        },
+        {
+          id: "tag_paiement",
+          label: "Paiement",
+          color: "#0288d1",
+        },
       ],
     },
     {
@@ -99,10 +123,22 @@ const customConfig: HelpdeskConfig = {
       ],
       defaultStatus: "open",
       tags: [
-        { value: "ui", label: "Interface", color: "#0288d1" },
-        { value: "mobile", label: "Mobile", color: "#1976d2" },
-        { value: "resolu", label: "Résolu", color: "#2e7d32" },
-        { value: "critique", label: "Critique", color: "#d32f2f" },
+        { id: "tag_ui", label: "Interface", color: "#0288d1" },
+        {
+          id: "tag_mobile",
+          label: "Mobile",
+          color: "#1976d2",
+        },
+        {
+          id: "tag_resolu",
+          label: "Résolu",
+          color: "#2e7d32",
+        },
+        {
+          id: "tag_critique",
+          label: "Critique",
+          color: "#d32f2f",
+        },
       ],
     },
     {
@@ -210,9 +246,9 @@ const mockTickets: Ticket[] = [
     status: "open",
     category: "technical_support",
     tags: [
-      { value: "urgent", label: "Urgent", color: "#d32f2f" },
-      { value: "bug", label: "Bug", color: "#f44336" },
-      { value: "connexion", label: "Connexion", color: "#1976d2" },
+      { id: "tag_urgent", label: "Urgent", color: "#d32f2f" },
+      { id: "tag_bug", label: "Bug", color: "#f44336" },
+      { id: "tag_connexion", label: "Connexion", color: "#1976d2" },
     ],
     createdAt: new Date("2025-07-15"),
     updatedAt: new Date("2025-07-15"),
@@ -268,8 +304,8 @@ const mockTickets: Ticket[] = [
     status: "in_progress",
     category: "billing",
     tags: [
-      { value: "remboursement", label: "Remboursement", color: "#ed6c02" },
-      { value: "facturation", label: "Facturation", color: "#9c27b0" },
+      { id: "tag_remboursement", label: "Remboursement", color: "#ed6c02" },
+      { id: "tag_facturation", label: "Facturation", color: "#9c27b0" },
     ],
     createdAt: new Date("2025-07-14"),
     updatedAt: new Date("2025-07-15"),
@@ -309,9 +345,9 @@ const mockTickets: Ticket[] = [
     status: "resolved",
     category: "bug_report",
     tags: [
-      { value: "ui", label: "Interface", color: "#0288d1" },
-      { value: "mobile", label: "Mobile", color: "#1976d2" },
-      { value: "resolu", label: "Résolu", color: "#2e7d32" },
+      { id: "tag_ui", label: "Interface", color: "#0288d1" },
+      { id: "tag_mobile", label: "Mobile", color: "#1976d2" },
+      { id: "tag_resolu", label: "Résolu", color: "#2e7d32" },
     ],
     createdAt: new Date("2025-07-13"),
     updatedAt: new Date("2025-07-14"),
@@ -368,12 +404,12 @@ const mockTickets: Ticket[] = [
     category: "feature_request",
     tags: [
       {
-        value: "nouvelle_fonctionnalite",
+        id: "tag_nouvelle_fonctionnalite",
         label: "Nouvelle fonctionnalité",
         color: "#0288d1",
       },
-      { value: "export", label: "Export", color: "#9c27b0" },
-      { value: "csv", label: "CSV", color: "#1976d2" },
+      { id: "tag_export", label: "Export", color: "#9c27b0" },
+      { id: "tag_csv", label: "CSV", color: "#1976d2" },
     ],
     createdAt: new Date("2025-07-12"),
     updatedAt: new Date("2025-07-12"),
@@ -401,9 +437,9 @@ const mockTickets: Ticket[] = [
     status: "in_progress",
     category: "billing",
     tags: [
-      { value: "facturation", label: "Facturation", color: "#9c27b0" },
-      { value: "recurrent", label: "Récurrent", color: "#ed6c02" },
-      { value: "urgent", label: "Urgent", color: "#d32f2f" },
+      { id: "tag_facturation", label: "Facturation", color: "#9c27b0" },
+      { id: "tag_recurrent", label: "Récurrent", color: "#ed6c02" },
+      { id: "tag_urgent", label: "Urgent", color: "#d32f2f" },
     ],
     createdAt: new Date("2025-07-10"),
     updatedAt: new Date("2025-07-14"),
@@ -1168,7 +1204,7 @@ export default function Home() {
           {/* Section TicketList indépendant */}
           <Paper sx={{ p: 3 }}>
             <Typography variant="h5" gutterBottom>
-              📋 TicketList (Composant indépendant)
+              �� TicketList (Composant indépendant)
             </Typography>
             <Typography variant="body2" color="text.secondary" paragraph>
               Le composant TicketList peut être utilisé de manière complètement

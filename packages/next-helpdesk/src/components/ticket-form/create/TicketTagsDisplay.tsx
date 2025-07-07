@@ -55,7 +55,7 @@ export const TicketTagsDisplay: React.FC<TicketTagsDisplayProps> = ({
       <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
         {availableTags.map((tag) => (
           <TagChip
-            key={tag.value}
+            key={tag.id}
             tag={tag}
             size="small"
             category={category}

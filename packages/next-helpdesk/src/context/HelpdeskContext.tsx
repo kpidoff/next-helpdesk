@@ -17,7 +17,7 @@ export interface StatusConfig {
 }
 
 export interface TagConfig {
-  value: string;
+  id: string; // Identifiant unique du tag
   label: string;
   color?: string; // Code hexadécimal ou couleur Material-UI
 }
@@ -279,7 +279,7 @@ export const HelpdeskProvider: React.FC<HelpdeskProviderProps> = ({
           if (cat.value === category) {
             const existingTags = cat.tags || [];
             // Vérifier si le tag existe déjà
-            const tagExists = existingTags.some((t) => t.value === tag.value);
+            const tagExists = existingTags.some((t) => t.id === tag.id);
             if (!tagExists) {
               const updatedTags = [...existingTags, tag];
               // Appeler le callback local si fourni
@@ -318,9 +318,7 @@ export const HelpdeskProvider: React.FC<HelpdeskProviderProps> = ({
         const updatedCategories = prevConfig.categories.map((cat) => {
           if (cat.value === category) {
             const existingTags = cat.tags || [];
-            const updatedTags = existingTags.filter(
-              (t) => t.value !== tagValue
-            );
+            const updatedTags = existingTags.filter((t) => t.id !== tagValue);
             // Appeler le callback local si fourni
             if (callback) {
               callback(category, tagValue);
