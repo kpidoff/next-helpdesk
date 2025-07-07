@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { TagConfig } from '../context/HelpdeskContext';
 
 export type Priority = 'low' | 'medium' | 'high';
 
@@ -17,6 +18,7 @@ export interface Ticket {
   priority: Priority;
   status: string;
   category: string;
+  tags?: TagConfig[];
   createdAt: Date;
   updatedAt: Date;
   author: Omit<User, 'role'>;

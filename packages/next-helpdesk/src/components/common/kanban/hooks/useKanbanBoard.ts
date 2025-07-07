@@ -17,6 +17,7 @@ export const useKanbanBoard = (
       description: ticket.description,
       priority: ticket.priority,
       category: ticket.category,
+      tags: ticket.tags || [],
       author: ticket.author,
       assignedTo: ticket.assignedTo,
       createdAt: ticket.createdAt,

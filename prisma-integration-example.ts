@@ -35,6 +35,7 @@ function transformPrismaTicketToTicket(prismaTicket: any): Ticket {
     priority: prismaTicket.priority.toLowerCase() as Priority,
     status: prismaTicket.status.toLowerCase() as string,
     category: prismaTicket.category,
+    tags: prismaTicket.tags || [],
     createdAt: prismaTicket.createdAt,
     updatedAt: prismaTicket.updatedAt,
     author: transformPrismaUserToUser(prismaTicket.author),
@@ -199,6 +200,11 @@ export async function createTicket(ticketData: {
   description: string;
   priority: Priority;
   category: string;
+  tags?: Array<{
+    value: string;
+    label: string;
+    color?: string;
+  }>;
   authorId: string;
   assignedToId?: string;
 }): Promise<Ticket> {
@@ -208,6 +214,7 @@ export async function createTicket(ticketData: {
       description: ticketData.description,
       priority: ticketData.priority.toUpperCase() as any,
       category: ticketData.category,
+      tags: ticketData.tags || [],
       authorId: ticketData.authorId,
       assignedToId: ticketData.assignedToId
     },
@@ -246,6 +253,11 @@ export async function updateTicket(
     priority?: Priority;
     status?: string;
     category?: string;
+    tags?: Array<{
+      value: string;
+      label: string;
+      color?: string;
+    }>;
     assignedToId?: string;
     hoursSpent?: number;
     startDate?: Date;
@@ -258,6 +270,7 @@ export async function updateTicket(
       ...updateData,
       priority: updateData.priority?.toUpperCase() as any,
       status: updateData.status?.toUpperCase() as any,
+      tags: updateData.tags,
       updatedAt: new Date()
     },
     include: {
@@ -452,6 +465,100 @@ export async function getTicketsAssignedToUser(userId: string): Promise<Ticket[]
   return prismaTickets.map(transformPrismaTicketToTicket);
 }
 
+/**
+ * Récupère les tickets par tags
+ */
+export async function getTicketsByTags(tagValues: string[]): Promise<Ticket[]> {
+  const prismaTickets = await prisma.ticket.findMany({
+    where: {
+      tags: {
+        some: {
+          value: {
+            in: tagValues
+          }
+        }
+      }
+    },
+    include: {
+      author: true,
+      assignedTo: true,
+      comments: {
+        include: {
+          author: true,
+          attachments: {
+            include: {
+              uploadedBy: true
+            }
+          }
+        }
+      },
+      attachments: {
+        include: {
+          uploadedBy: true
+        }
+      }
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  });
+
+  return prismaTickets.map(transformPrismaTicketToTicket);
+}
+
+/**
+ * Récupère tous les tags utilisés dans les tickets
+ */
+export async function getAllTags(): Promise<Array<{
+  value: string;
+  label: string;
+  color?: string;
+  count: number;
+}>> {
+  const tickets = await getAllTickets();
+  const tagCounts: Record<string, { value: string; label: string; color?: string; count: number }> = {};
+
+  tickets.forEach(ticket => {
+    ticket.tags?.forEach(tag => {
+      if (tagCounts[tag.value]) {
+        tagCounts[tag.value].count++;
+      } else {
+        tagCounts[tag.value] = {
+          value: tag.value,
+          label: tag.label,
+          color: tag.color,
+          count: 1
+        };
+      }
+    });
+  });
+
+  return Object.values(tagCounts).sort((a, b) => b.count - a.count);
+}
+
+/**
+ * Supprime un tag d'une catégorie
+ */
+export async function removeTagFromCategory(
+  category: string,
+  tagValue: string
+): Promise<void> {
+  // Supprimer le tag de la configuration de la catégorie
+  // Cette fonction devrait être implémentée selon votre logique métier
+  
+  // Exemple : supprimer le tag de tous les tickets de cette catégorie
+  const tickets = await getTicketsByCategory(category);
+  
+  for (const ticket of tickets) {
+    if (ticket.tags) {
+      const updatedTags = ticket.tags.filter(tag => tag.value !== tagValue);
+      await updateTicket(ticket.id, { tags: updatedTags });
+    }
+  }
+  
+  console.log(`Tag "${tagValue}" supprimé de la catégorie "${category}"`);
+}
+
 // ============================================================================
 // EXEMPLE D'UTILISATION DANS UNE API ROUTE (Next.js)
 // ============================================================================
@@ -478,6 +585,61 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   } else {
     res.setHeader('Allow', ['GET', 'POST']);
+    res.status(405).end(`Method ${req.method} Not Allowed`);
+  }
+}
+
+// pages/api/tickets/with-tags.ts
+import { NextApiRequest, NextApiResponse } from 'next';
+import { createTicket, updateTicket, removeTagFromCategory } from '../../../lib/prisma-integration';
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (req.method === 'POST') {
+    try {
+      // Exemple de création d'un ticket avec des tags
+      const ticket = await createTicket({
+        title: "Problème de connexion",
+        description: "Impossible de se connecter à l'application",
+        priority: "high",
+        category: "technical",
+        tags: [
+          { value: "urgent", label: "Urgent", color: "error" },
+          { value: "bug", label: "Bug", color: "error" },
+          { value: "connexion", label: "Connexion", color: "primary" }
+        ],
+        authorId: "user-123",
+        assignedToId: "agent-456"
+      });
+      res.status(201).json(ticket);
+    } catch (error) {
+      res.status(500).json({ error: 'Erreur lors de la création du ticket' });
+    }
+  } else if (req.method === 'PUT') {
+    try {
+      const { id, ...updateData } = req.body;
+      // Exemple de mise à jour d'un ticket avec de nouveaux tags
+      const ticket = await updateTicket(id, {
+        ...updateData,
+        tags: [
+          { value: "resolu", label: "Résolu", color: "success" },
+          { value: "teste", label: "Testé", color: "info" }
+        ]
+      });
+      res.status(200).json(ticket);
+    } catch (error) {
+      res.status(500).json({ error: 'Erreur lors de la mise à jour du ticket' });
+    }
+  } else if (req.method === 'DELETE') {
+    try {
+      const { category, tagValue } = req.body;
+      // Exemple de suppression d'un tag d'une catégorie
+      await removeTagFromCategory(category, tagValue);
+      res.status(200).json({ message: `Tag "${tagValue}" supprimé de la catégorie "${category}"` });
+    } catch (error) {
+      res.status(500).json({ error: 'Erreur lors de la suppression du tag' });
+    }
+  } else {
+    res.setHeader('Allow', ['POST', 'PUT', 'DELETE']);
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }

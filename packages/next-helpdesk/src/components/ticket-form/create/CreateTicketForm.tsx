@@ -20,6 +20,8 @@ import { TicketBasicFields } from "./TicketBasicFields";
 import { TicketCategoryField } from "./TicketCategoryField";
 import { TicketFileUpload } from "../common/TicketFileUpload";
 import { TicketPriorityField } from "./TicketPriorityField";
+import { TicketTagsDisplay } from "./TicketTagsDisplay";
+import { TicketTagsField } from "./TicketTagsField";
 import { User } from "../../../types";
 import { useHelpdesk } from "../../../context/HelpdeskContext";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -52,6 +54,7 @@ export const CreateTicketForm: React.FC<CreateTicketFormProps> = ({
       category: "",
       priority: config.defaultPriority,
       assignedTo: "",
+      tags: [],
       files: [],
     },
   });
@@ -60,8 +63,11 @@ export const CreateTicketForm: React.FC<CreateTicketFormProps> = ({
     control,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = methods;
+
+  const selectedCategory = watch("category");
 
   const handleFormSubmit = async (data: CreateTicketFormData) => {
     try {
@@ -115,6 +121,18 @@ export const CreateTicketForm: React.FC<CreateTicketFormProps> = ({
                 users={users}
                 currentUser={currentUser}
               />
+
+              {selectedCategory &&
+                (currentUser.role === "admin" ||
+                currentUser.role === "agent" ? (
+                  <TicketTagsField
+                    control={control}
+                    errors={errors}
+                    category={selectedCategory}
+                  />
+                ) : (
+                  <TicketTagsDisplay category={selectedCategory} />
+                ))}
 
               <TicketFileUpload
                 control={control}

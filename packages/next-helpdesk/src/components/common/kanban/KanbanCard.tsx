@@ -2,6 +2,7 @@ import { Box, Chip, Divider, Stack, Typography } from "@mui/material";
 
 import { PriorityChip } from "../PriorityChip";
 import React from "react";
+import { TagChip } from "../TagChip";
 import { TicketCard } from "./types";
 import { UserAvatar } from "../UserAvatar";
 import { useHelpdesk } from "../../../context/HelpdeskContext";
@@ -58,6 +59,30 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
         <Box sx={{ display: "flex", gap: 1, mb: 1, flexWrap: "wrap" }}>
           <PriorityChip priority={card.priority} size="small" />
         </Box>
+
+        {/* Tags */}
+        {card.tags && card.tags.length > 0 && (
+          <Box sx={{ display: "flex", gap: 0.5, mb: 1, flexWrap: "wrap" }}>
+            {card.tags.slice(0, 3).map((tag) => (
+              <TagChip
+                key={tag.value}
+                tag={tag}
+                size="small"
+                category={card.category}
+                deletable={true}
+                globalDelete={true}
+              />
+            ))}
+            {card.tags.length > 3 && (
+              <Chip
+                label={`+${card.tags.length - 3}`}
+                size="small"
+                variant="outlined"
+                sx={{ fontSize: "0.7rem", height: 20 }}
+              />
+            )}
+          </Box>
+        )}
       </Box>
 
       {/* Description */}

@@ -16,11 +16,25 @@ export interface StatusConfig {
     | "default";
 }
 
+export interface TagConfig {
+  value: string;
+  label: string;
+  color?:
+    | "primary"
+    | "secondary"
+    | "error"
+    | "info"
+    | "success"
+    | "warning"
+    | "default";
+}
+
 export interface CategoryConfig {
   value: string;
   label: string;
   statuses: StatusConfig[];
   defaultStatus?: string;
+  tags?: TagConfig[];
 }
 
 export interface HelpdeskConfig {
@@ -61,6 +75,17 @@ export interface HelpdeskContextType {
   setUsers: (users: User[]) => void;
   getStatusesForCategory: (category: string) => StatusConfig[];
   getDefaultStatusForCategory: (category: string) => string | undefined;
+  getTagsForCategory: (category: string) => TagConfig[];
+  addTagToCategory: (
+    category: string,
+    tag: TagConfig,
+    onTagAdded?: (category: string, tag: TagConfig) => void
+  ) => void;
+  removeTagFromCategory: (
+    category: string,
+    tagValue: string,
+    onTagRemoved?: (category: string, tagValue: string) => void
+  ) => void;
 }
 
 const defaultConfig: HelpdeskConfig = {
@@ -169,6 +194,7 @@ interface HelpdeskProviderProps {
   userRole?: UserRole;
   currentUser: User;
   users: User[];
+  onTagRemoved?: (category: string, tagValue: string) => void;
 }
 
 export const HelpdeskProvider: React.FC<HelpdeskProviderProps> = ({
@@ -177,6 +203,7 @@ export const HelpdeskProvider: React.FC<HelpdeskProviderProps> = ({
   userRole = "user",
   currentUser: initialUser,
   users: initialUsers,
+  onTagRemoved,
 }) => {
   const [config, setConfig] = React.useState<HelpdeskConfig>({
     ...defaultConfig,
@@ -224,6 +251,79 @@ export const HelpdeskProvider: React.FC<HelpdeskProviderProps> = ({
     [config]
   );
 
+  // Fonction utilitaire pour obtenir les tags d'une catégorie
+  const getTagsForCategory = React.useCallback(
+    (category: string): TagConfig[] => {
+      const categoryConfig = config.categories.find(
+        (c) => c.value === category
+      );
+      return categoryConfig?.tags || [];
+    },
+    [config]
+  );
+
+  // Fonction pour ajouter un tag à une catégorie
+  const addTagToCategory = React.useCallback(
+    (
+      category: string,
+      tag: TagConfig,
+      onTagAdded?: (category: string, tag: TagConfig) => void
+    ) => {
+      setConfig((prevConfig) => {
+        const updatedCategories = prevConfig.categories.map((cat) => {
+          if (cat.value === category) {
+            const existingTags = cat.tags || [];
+            // Vérifier si le tag existe déjà
+            const tagExists = existingTags.some((t) => t.value === tag.value);
+            if (!tagExists) {
+              const updatedTags = [...existingTags, tag];
+              // Appeler le callback si fourni
+              if (onTagAdded) {
+                onTagAdded(category, tag);
+              }
+              return { ...cat, tags: updatedTags };
+            }
+          }
+          return cat;
+        });
+        return { ...prevConfig, categories: updatedCategories };
+      });
+    },
+    []
+  );
+
+  // Fonction pour supprimer un tag d'une catégorie
+  const removeTagFromCategory = React.useCallback(
+    (
+      category: string,
+      tagValue: string,
+      callback?: (category: string, tagValue: string) => void
+    ) => {
+      setConfig((prevConfig) => {
+        const updatedCategories = prevConfig.categories.map((cat) => {
+          if (cat.value === category) {
+            const existingTags = cat.tags || [];
+            const updatedTags = existingTags.filter(
+              (t) => t.value !== tagValue
+            );
+            // Appeler le callback si fourni
+            if (callback) {
+              callback(category, tagValue);
+            }
+            // Appeler le callback global si fourni
+            if (onTagRemoved) {
+              onTagRemoved(category, tagValue);
+            }
+            return { ...cat, tags: updatedTags };
+          }
+          return cat;
+        });
+        return { ...prevConfig, categories: updatedCategories };
+      });
+    },
+    []
+  );
+
   const value: HelpdeskContextType = {
     config,
     userRole: role,
@@ -238,6 +338,9 @@ export const HelpdeskProvider: React.FC<HelpdeskProviderProps> = ({
     setUsers,
     getStatusesForCategory,
     getDefaultStatusForCategory,
+    getTagsForCategory,
+    addTagToCategory,
+    removeTagFromCategory,
   };
 
   return (

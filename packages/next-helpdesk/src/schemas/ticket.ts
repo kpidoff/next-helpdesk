@@ -18,6 +18,13 @@ export const createTicketSchema = z.object({
   assignedTo: z
     .string()
     .optional(),
+  tags: z
+    .array(z.object({
+      value: z.string(),
+      label: z.string(),
+      color: z.enum(['primary', 'secondary', 'error', 'info', 'success', 'warning', 'default']).optional(),
+    }))
+    .optional(),
   files: z
     .any()
     .optional()

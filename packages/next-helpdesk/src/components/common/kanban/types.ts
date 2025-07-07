@@ -1,6 +1,7 @@
 import { Ticket, User } from "../../../types";
 
 import { Card as KanbanCard } from "@caldwell619/react-kanban";
+import { TagConfig } from "../../../context/HelpdeskContext";
 import { UpdateTicketFormData } from "@/schemas/ticket";
 
 export interface TicketKanbanProps {
@@ -17,6 +18,7 @@ export interface TicketKanbanProps {
 export interface TicketCard extends KanbanCard {
   priority: string;
   category: string;
+  tags?: TagConfig[];
   author: Omit<User, "role">;
   assignedTo?: Omit<User, "role">;
   createdAt: Date;

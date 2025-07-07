@@ -32,6 +32,8 @@ import { Controller, useForm } from "react-hook-form";
 import {
   PrioritySelect,
   StatusSelect,
+  TagChip,
+  TagSelect,
   TimeTrackingFields,
   UserAvatar,
   UserSelect,
@@ -98,6 +100,7 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
     control,
     handleSubmit,
     reset,
+    watch,
     formState: { errors, isDirty },
   } = useForm<UpdateTicketFormData>({
     resolver: zodResolver(updateTicketSchema),
@@ -108,12 +111,15 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
       priority: ticket.priority,
       status: ticket.status,
       assignedTo: ticket.assignedTo?.id || "",
+      tags: ticket.tags || [],
       files: [],
       hoursSpent: ticket.hoursSpent || 0,
       startDate: ticket.startDate ? new Date(ticket.startDate) : undefined,
       endDate: ticket.endDate ? new Date(ticket.endDate) : undefined,
     },
   });
+
+  const selectedCategory = watch("category");
 
   // Réinitialiser le formulaire quand le ticket change
   useEffect(() => {
@@ -124,6 +130,7 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
       priority: ticket.priority,
       status: ticket.status,
       assignedTo: ticket.assignedTo?.id || "",
+      tags: ticket.tags || [],
       files: [],
       hoursSpent: ticket.hoursSpent || 0,
       startDate: ticket.startDate ? new Date(ticket.startDate) : undefined,
@@ -500,6 +507,76 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
                         )}
                       </Grid>
                     )}
+
+                    {/* Tags */}
+                    <Grid item xs={12}>
+                      {isEditing ? (
+                        currentUser.role === "admin" ||
+                        currentUser.role === "agent" ? (
+                          <Controller
+                            name="tags"
+                            control={control}
+                            render={({ field }) => (
+                              <TagSelect
+                                category={selectedCategory}
+                                value={field.value || []}
+                                onChange={field.onChange}
+                                label="Tags"
+                                placeholder="Sélectionner ou créer des tags..."
+                                error={!!errors.tags}
+                                helperText={errors.tags?.message}
+                                deletable={true}
+                              />
+                            )}
+                          />
+                        ) : (
+                          <TextField
+                            label="Tags"
+                            value={
+                              ticket.tags && ticket.tags.length > 0
+                                ? ticket.tags.map((tag) => tag.label).join(", ")
+                                : "Aucun tag"
+                            }
+                            fullWidth
+                            disabled
+                            helperText="Seuls les agents et admins peuvent modifier les tags"
+                          />
+                        )
+                      ) : (
+                        <Box>
+                          <Typography
+                            variant="subtitle2"
+                            color="text.secondary"
+                            gutterBottom
+                          >
+                            Tags
+                          </Typography>
+                          <Box
+                            sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}
+                          >
+                            {ticket.tags && ticket.tags.length > 0 ? (
+                              ticket.tags.map((tag) => (
+                                <TagChip
+                                  key={tag.value}
+                                  tag={tag}
+                                  size="small"
+                                  category={selectedCategory}
+                                  deletable={true}
+                                  globalDelete={true}
+                                />
+                              ))
+                            ) : (
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                Aucun tag
+                              </Typography>
+                            )}
+                          </Box>
+                        </Box>
+                      )}
+                    </Grid>
 
                     {/* Auteur */}
                     <Grid item xs={12} md={6}>

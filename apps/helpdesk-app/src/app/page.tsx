@@ -43,6 +43,12 @@ const customConfig: HelpdeskConfig = {
         // { value: "closed", label: "Fermé", color: "default" },
       ],
       defaultStatus: "open",
+      tags: [
+        { value: "urgent", label: "Urgent", color: "error" },
+        { value: "bug", label: "Bug", color: "error" },
+        { value: "connexion", label: "Connexion", color: "primary" },
+        { value: "performance", label: "Performance", color: "warning" },
+      ],
     },
     {
       value: "billing",
@@ -54,6 +60,11 @@ const customConfig: HelpdeskConfig = {
         { value: "closed", label: "Fermé", color: "default" },
       ],
       defaultStatus: "open",
+      tags: [
+        { value: "remboursement", label: "Remboursement", color: "warning" },
+        { value: "facturation", label: "Facturation", color: "secondary" },
+        { value: "paiement", label: "Paiement", color: "info" },
+      ],
     },
     {
       value: "user_account",
@@ -87,6 +98,12 @@ const customConfig: HelpdeskConfig = {
         { value: "closed", label: "Fermé", color: "default" },
       ],
       defaultStatus: "open",
+      tags: [
+        { value: "ui", label: "Interface", color: "info" },
+        { value: "mobile", label: "Mobile", color: "primary" },
+        { value: "resolu", label: "Résolu", color: "success" },
+        { value: "critique", label: "Critique", color: "error" },
+      ],
     },
     {
       value: "information_request",
@@ -192,6 +209,11 @@ const mockTickets: Ticket[] = [
     priority: "high",
     status: "open",
     category: "technical_support",
+    tags: [
+      { value: "urgent", label: "Urgent", color: "error" },
+      { value: "bug", label: "Bug", color: "error" },
+      { value: "connexion", label: "Connexion", color: "primary" },
+    ],
     createdAt: new Date("2025-07-15"),
     updatedAt: new Date("2025-07-15"),
     author: mockUsers[0],
@@ -245,6 +267,10 @@ const mockTickets: Ticket[] = [
     priority: "medium",
     status: "in_progress",
     category: "billing",
+    tags: [
+      { value: "remboursement", label: "Remboursement", color: "warning" },
+      { value: "facturation", label: "Facturation", color: "secondary" },
+    ],
     createdAt: new Date("2025-07-14"),
     updatedAt: new Date("2025-07-15"),
     author: mockUsers[1],
@@ -282,6 +308,11 @@ const mockTickets: Ticket[] = [
     priority: "low",
     status: "resolved",
     category: "bug_report",
+    tags: [
+      { value: "ui", label: "Interface", color: "info" },
+      { value: "mobile", label: "Mobile", color: "primary" },
+      { value: "resolu", label: "Résolu", color: "success" },
+    ],
     createdAt: new Date("2025-07-13"),
     updatedAt: new Date("2025-07-14"),
     author: mockUsers[3],
@@ -335,6 +366,15 @@ const mockTickets: Ticket[] = [
     priority: "medium",
     status: "open",
     category: "feature_request",
+    tags: [
+      {
+        value: "nouvelle_fonctionnalite",
+        label: "Nouvelle fonctionnalité",
+        color: "info",
+      },
+      { value: "export", label: "Export", color: "secondary" },
+      { value: "csv", label: "CSV", color: "primary" },
+    ],
     createdAt: new Date("2025-07-12"),
     updatedAt: new Date("2025-07-12"),
     author: mockUsers[4],
@@ -360,6 +400,11 @@ const mockTickets: Ticket[] = [
     priority: "high",
     status: "in_progress",
     category: "billing",
+    tags: [
+      { value: "facturation", label: "Facturation", color: "secondary" },
+      { value: "recurrent", label: "Récurrent", color: "warning" },
+      { value: "urgent", label: "Urgent", color: "error" },
+    ],
     createdAt: new Date("2025-07-10"),
     updatedAt: new Date("2025-07-14"),
     author: mockUsers[0],
@@ -574,12 +619,39 @@ export default function Home() {
     alert("Ticket clôturé avec succès !");
   };
 
+  // Callback pour la suppression de tags
+  const handleTagRemoved = async (category: string, tagValue: string) => {
+    console.log("🗑️ Suppression de tag:", { category, tagValue });
+
+    try {
+      // Ici vous pouvez ajouter votre logique de suppression en base de données
+      // Par exemple :
+      // await fetch('/api/tags', {
+      //   method: 'DELETE',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ category, tagValue })
+      // });
+
+      console.log(
+        `✅ Tag "${tagValue}" supprimé de la catégorie "${category}"`
+      );
+
+      // Optionnel : notifier l'utilisateur
+      // alert(`Tag "${tagValue}" supprimé avec succès !`);
+    } catch (error) {
+      console.error("❌ Erreur lors de la suppression du tag:", error);
+      // Optionnel : notifier l'erreur à l'utilisateur
+      // alert("Erreur lors de la suppression du tag");
+    }
+  };
+
   return (
     <HelpdeskProvider
       config={customConfig}
       userRole={currentUser.role}
       currentUser={currentUser}
       users={mockUsers}
+      onTagRemoved={handleTagRemoved}
     >
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Typography variant="h3" gutterBottom align="center">
@@ -716,6 +788,50 @@ export default function Home() {
         </Paper>
 
         <Stack spacing={4}>
+          {/* Section Démonstration des Tags */}
+          <Paper sx={{ p: 3 }}>
+            <Typography variant="h5" gutterBottom>
+              🏷️ Démonstration des Tags
+            </Typography>
+            <Typography variant="body2" color="text.secondary" paragraph>
+              Les tickets de démonstration incluent maintenant des tags pour
+              montrer le système de catégorisation avancée.
+            </Typography>
+
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="h6" gutterBottom>
+                Tags des Tickets de Démonstration
+              </Typography>
+              <Typography variant="body2" color="text.secondary" paragraph>
+                Voici les tags utilisés dans les tickets de démonstration :
+              </Typography>
+
+              <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 2 }}>
+                <Chip label="Urgent" color="error" size="small" />
+                <Chip label="Bug" color="error" size="small" />
+                <Chip label="Connexion" color="primary" size="small" />
+                <Chip label="Remboursement" color="warning" size="small" />
+                <Chip label="Facturation" color="secondary" size="small" />
+                <Chip label="Interface" color="info" size="small" />
+                <Chip label="Mobile" color="primary" size="small" />
+                <Chip label="Résolu" color="success" size="small" />
+                <Chip
+                  label="Nouvelle fonctionnalité"
+                  color="info"
+                  size="small"
+                />
+                <Chip label="Export" color="secondary" size="small" />
+                <Chip label="CSV" color="primary" size="small" />
+                <Chip label="Récurrent" color="warning" size="small" />
+              </Box>
+
+              <Typography variant="body2" color="text.secondary">
+                Ces tags apparaîtront dans les cartes Kanban et les listes de
+                tickets une fois que le système de tags sera déployé.
+              </Typography>
+            </Box>
+          </Paper>
+
           {/* Section Composants Communs */}
           <Paper sx={{ p: 3 }}>
             <Typography variant="h5" gutterBottom>

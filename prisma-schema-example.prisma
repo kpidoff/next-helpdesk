@@ -30,6 +30,36 @@ model User {
     @@map("users")
 }
 
+// Modèle Tag pour gérer les tags des tickets
+model Tag {
+    id        String   @id @default(cuid())
+    value     String   @unique
+    label     String
+    color     String?  @default("default")
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Relations
+    tickets TicketTag[]
+
+    @@map("tags")
+}
+
+// Modèle de liaison many-to-many entre Ticket et Tag
+model TicketTag {
+    id        String   @id @default(cuid())
+    ticketId  String
+    tagId     String
+    createdAt DateTime @default(now())
+
+    // Relations
+    ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+    tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+    @@unique([ticketId, tagId])
+    @@map("ticket_tags")
+}
+
 // Modèle Ticket correspondant à l'interface Ticket de Next-Helpdesk
 model Ticket {
     id          String    @id @default(cuid())
@@ -53,6 +83,7 @@ model Ticket {
 
     comments    Comment[]
     attachments Attachment[]
+    tags        TicketTag[]
 
     @@map("tickets")
 }
