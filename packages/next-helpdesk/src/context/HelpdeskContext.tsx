@@ -19,14 +19,7 @@ export interface StatusConfig {
 export interface TagConfig {
   value: string;
   label: string;
-  color?:
-    | "primary"
-    | "secondary"
-    | "error"
-    | "info"
-    | "success"
-    | "warning"
-    | "default";
+  color?: string; // Code hexadécimal ou couleur Material-UI
 }
 
 export interface CategoryConfig {

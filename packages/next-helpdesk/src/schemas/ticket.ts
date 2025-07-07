@@ -22,7 +22,7 @@ export const createTicketSchema = z.object({
     .array(z.object({
       value: z.string(),
       label: z.string(),
-      color: z.enum(['primary', 'secondary', 'error', 'info', 'success', 'warning', 'default']).optional(),
+      color: z.string().optional(), // Support des couleurs hexadécimales
     }))
     .optional(),
   files: z

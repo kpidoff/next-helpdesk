@@ -53,9 +53,14 @@ export const TagChip: React.FC<TagChipProps> = ({
   return (
     <Chip
       label={label}
-      color={tag.color || "default"}
+      color="default"
       size={size}
       onDelete={canDelete ? handleDelete : undefined}
+      sx={{
+        bgcolor: tag.color?.startsWith("#") ? tag.color : undefined,
+        color: tag.color?.startsWith("#") ? "white" : undefined,
+        ...chipProps.sx,
+      }}
       {...chipProps}
     />
   );

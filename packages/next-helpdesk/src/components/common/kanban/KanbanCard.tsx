@@ -69,8 +69,6 @@ export const KanbanCard: React.FC<KanbanCardProps> = ({
                 tag={tag}
                 size="small"
                 category={card.category}
-                deletable={true}
-                globalDelete={true}
               />
             ))}
             {card.tags.length > 3 && (

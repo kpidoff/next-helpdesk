@@ -44,10 +44,10 @@ const customConfig: HelpdeskConfig = {
       ],
       defaultStatus: "open",
       tags: [
-        { value: "urgent", label: "Urgent", color: "error" },
-        { value: "bug", label: "Bug", color: "error" },
-        { value: "connexion", label: "Connexion", color: "primary" },
-        { value: "performance", label: "Performance", color: "warning" },
+        { value: "urgent", label: "Urgent", color: "#d32f2f" },
+        { value: "bug", label: "Bug", color: "#f44336" },
+        { value: "connexion", label: "Connexion", color: "#1976d2" },
+        { value: "performance", label: "Performance", color: "#ed6c02" },
       ],
     },
     {
@@ -61,9 +61,9 @@ const customConfig: HelpdeskConfig = {
       ],
       defaultStatus: "open",
       tags: [
-        { value: "remboursement", label: "Remboursement", color: "warning" },
-        { value: "facturation", label: "Facturation", color: "secondary" },
-        { value: "paiement", label: "Paiement", color: "info" },
+        { value: "remboursement", label: "Remboursement", color: "#ed6c02" },
+        { value: "facturation", label: "Facturation", color: "#9c27b0" },
+        { value: "paiement", label: "Paiement", color: "#0288d1" },
       ],
     },
     {
@@ -99,10 +99,10 @@ const customConfig: HelpdeskConfig = {
       ],
       defaultStatus: "open",
       tags: [
-        { value: "ui", label: "Interface", color: "info" },
-        { value: "mobile", label: "Mobile", color: "primary" },
-        { value: "resolu", label: "Résolu", color: "success" },
-        { value: "critique", label: "Critique", color: "error" },
+        { value: "ui", label: "Interface", color: "#0288d1" },
+        { value: "mobile", label: "Mobile", color: "#1976d2" },
+        { value: "resolu", label: "Résolu", color: "#2e7d32" },
+        { value: "critique", label: "Critique", color: "#d32f2f" },
       ],
     },
     {
@@ -210,9 +210,9 @@ const mockTickets: Ticket[] = [
     status: "open",
     category: "technical_support",
     tags: [
-      { value: "urgent", label: "Urgent", color: "error" },
-      { value: "bug", label: "Bug", color: "error" },
-      { value: "connexion", label: "Connexion", color: "primary" },
+      { value: "urgent", label: "Urgent", color: "#d32f2f" },
+      { value: "bug", label: "Bug", color: "#f44336" },
+      { value: "connexion", label: "Connexion", color: "#1976d2" },
     ],
     createdAt: new Date("2025-07-15"),
     updatedAt: new Date("2025-07-15"),
@@ -268,8 +268,8 @@ const mockTickets: Ticket[] = [
     status: "in_progress",
     category: "billing",
     tags: [
-      { value: "remboursement", label: "Remboursement", color: "warning" },
-      { value: "facturation", label: "Facturation", color: "secondary" },
+      { value: "remboursement", label: "Remboursement", color: "#ed6c02" },
+      { value: "facturation", label: "Facturation", color: "#9c27b0" },
     ],
     createdAt: new Date("2025-07-14"),
     updatedAt: new Date("2025-07-15"),
@@ -309,9 +309,9 @@ const mockTickets: Ticket[] = [
     status: "resolved",
     category: "bug_report",
     tags: [
-      { value: "ui", label: "Interface", color: "info" },
-      { value: "mobile", label: "Mobile", color: "primary" },
-      { value: "resolu", label: "Résolu", color: "success" },
+      { value: "ui", label: "Interface", color: "#0288d1" },
+      { value: "mobile", label: "Mobile", color: "#1976d2" },
+      { value: "resolu", label: "Résolu", color: "#2e7d32" },
     ],
     createdAt: new Date("2025-07-13"),
     updatedAt: new Date("2025-07-14"),
@@ -370,10 +370,10 @@ const mockTickets: Ticket[] = [
       {
         value: "nouvelle_fonctionnalite",
         label: "Nouvelle fonctionnalité",
-        color: "info",
+        color: "#0288d1",
       },
-      { value: "export", label: "Export", color: "secondary" },
-      { value: "csv", label: "CSV", color: "primary" },
+      { value: "export", label: "Export", color: "#9c27b0" },
+      { value: "csv", label: "CSV", color: "#1976d2" },
     ],
     createdAt: new Date("2025-07-12"),
     updatedAt: new Date("2025-07-12"),
@@ -401,9 +401,9 @@ const mockTickets: Ticket[] = [
     status: "in_progress",
     category: "billing",
     tags: [
-      { value: "facturation", label: "Facturation", color: "secondary" },
-      { value: "recurrent", label: "Récurrent", color: "warning" },
-      { value: "urgent", label: "Urgent", color: "error" },
+      { value: "facturation", label: "Facturation", color: "#9c27b0" },
+      { value: "recurrent", label: "Récurrent", color: "#ed6c02" },
+      { value: "urgent", label: "Urgent", color: "#d32f2f" },
     ],
     createdAt: new Date("2025-07-10"),
     updatedAt: new Date("2025-07-14"),
@@ -804,8 +804,10 @@ export default function Home() {
               🏷️ Démonstration des Tags
             </Typography>
             <Typography variant="body2" color="text.secondary" paragraph>
-              Les tickets de démonstration incluent maintenant des tags pour
-              montrer le système de catégorisation avancée.
+              Les tickets de démonstration incluent maintenant des tags avec des
+              couleurs hexadécimales personnalisées. Lors de la création d'un
+              nouveau tag, vous pouvez choisir une couleur parmi une palette
+              prédéfinie ou utiliser un sélecteur de couleur personnalisé.
             </Typography>
 
             <Box sx={{ mb: 3 }}>
@@ -817,27 +819,89 @@ export default function Home() {
               </Typography>
 
               <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 2 }}>
-                <Chip label="Urgent" color="error" size="small" />
-                <Chip label="Bug" color="error" size="small" />
-                <Chip label="Connexion" color="primary" size="small" />
-                <Chip label="Remboursement" color="warning" size="small" />
-                <Chip label="Facturation" color="secondary" size="small" />
-                <Chip label="Interface" color="info" size="small" />
-                <Chip label="Mobile" color="primary" size="small" />
-                <Chip label="Résolu" color="success" size="small" />
                 <Chip
-                  label="Nouvelle fonctionnalité"
-                  color="info"
+                  label="Urgent"
+                  sx={{ bgcolor: "#d32f2f", color: "white" }}
                   size="small"
                 />
-                <Chip label="Export" color="secondary" size="small" />
-                <Chip label="CSV" color="primary" size="small" />
-                <Chip label="Récurrent" color="warning" size="small" />
+                <Chip
+                  label="Bug"
+                  sx={{ bgcolor: "#f44336", color: "white" }}
+                  size="small"
+                />
+                <Chip
+                  label="Connexion"
+                  sx={{ bgcolor: "#1976d2", color: "white" }}
+                  size="small"
+                />
+                <Chip
+                  label="Remboursement"
+                  sx={{ bgcolor: "#ed6c02", color: "white" }}
+                  size="small"
+                />
+                <Chip
+                  label="Facturation"
+                  sx={{ bgcolor: "#9c27b0", color: "white" }}
+                  size="small"
+                />
+                <Chip
+                  label="Interface"
+                  sx={{ bgcolor: "#0288d1", color: "white" }}
+                  size="small"
+                />
+                <Chip
+                  label="Mobile"
+                  sx={{ bgcolor: "#1976d2", color: "white" }}
+                  size="small"
+                />
+                <Chip
+                  label="Résolu"
+                  sx={{ bgcolor: "#2e7d32", color: "white" }}
+                  size="small"
+                />
+                <Chip
+                  label="Nouvelle fonctionnalité"
+                  sx={{ bgcolor: "#0288d1", color: "white" }}
+                  size="small"
+                />
+                <Chip
+                  label="Export"
+                  sx={{ bgcolor: "#9c27b0", color: "white" }}
+                  size="small"
+                />
+                <Chip
+                  label="CSV"
+                  sx={{ bgcolor: "#1976d2", color: "white" }}
+                  size="small"
+                />
+                <Chip
+                  label="Récurrent"
+                  sx={{ bgcolor: "#ed6c02", color: "white" }}
+                  size="small"
+                />
               </Box>
 
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="text.secondary" paragraph>
                 Ces tags apparaîtront dans les cartes Kanban et les listes de
-                tickets une fois que le système de tags sera déployé.
+                tickets avec leurs couleurs personnalisées.
+              </Typography>
+
+              <Typography variant="subtitle2" gutterBottom sx={{ mt: 3 }}>
+                🎨 Nouveau : Sélection de couleur lors de la création de tags
+              </Typography>
+              <Typography variant="body2" color="text.secondary" paragraph>
+                Lorsque vous créez un nouveau tag, un dialog s'ouvre pour vous
+                permettre de :
+              </Typography>
+              <Typography
+                variant="body2"
+                component="ul"
+                sx={{ m: 0, pl: 2, mb: 2 }}
+              >
+                <li>Choisir parmi 8 couleurs prédéfinies</li>
+                <li>Utiliser un sélecteur de couleur personnalisé</li>
+                <li>Voir un aperçu en temps réel du tag</li>
+                <li>Personnaliser complètement l'apparence de vos tags</li>
               </Typography>
             </Box>
           </Paper>
