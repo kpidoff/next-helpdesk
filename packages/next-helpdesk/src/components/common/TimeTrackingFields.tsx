@@ -27,6 +27,7 @@ interface TimeTrackingFieldsProps {
   currentUser: import("../../types").User;
   onAddTest?: (test: Omit<import("../../types").TestItem, 'id' | 'createdAt' | 'createdBy'>) => void;
   onUpdateTest?: (testId: string, updates: Partial<import("../../types").TestItem>) => void;
+  onDeleteTest?: (testId: string) => void;
   onAddTestComment?: (testId: string, comment: Omit<import("../../types").TestComment, 'id' | 'testId' | 'createdAt' | 'createdBy'>) => void;
 }
 
@@ -41,6 +42,7 @@ export const TimeTrackingFields: React.FC<TimeTrackingFieldsProps> = ({
   currentUser,
   onAddTest,
   onUpdateTest,
+  onDeleteTest,
   onAddTestComment,
 }) => {
   const { config } = useHelpdesk();
@@ -360,6 +362,7 @@ export const TimeTrackingFields: React.FC<TimeTrackingFieldsProps> = ({
         currentUser={currentUser}
         onAddTest={onAddTest}
         onUpdateTest={onUpdateTest}
+        onDeleteTest={onDeleteTest}
         onAddComment={onAddTestComment}
       />
 

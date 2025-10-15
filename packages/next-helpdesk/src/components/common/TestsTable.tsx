@@ -30,6 +30,7 @@ import {
 import {
   Add,
   Comment as CommentIcon,
+  Delete,
   ExpandMore,
   Launch,
 } from "@mui/icons-material";
@@ -45,6 +46,7 @@ interface TestsTableProps {
   currentUser: User;
   onAddTest?: (test: Omit<TestItem, 'id' | 'createdAt' | 'createdBy'>) => void;
   onUpdateTest?: (testId: string, updates: Partial<TestItem>) => void;
+  onDeleteTest?: (testId: string) => void;
   onAddComment?: (testId: string, comment: Omit<TestComment, 'id' | 'testId' | 'createdAt' | 'createdBy'>) => void;
 }
 
@@ -63,6 +65,7 @@ export const TestsTable: React.FC<TestsTableProps> = ({
   currentUser,
   onAddTest,
   onUpdateTest,
+  onDeleteTest,
   onAddComment,
 }) => {
   const [openAddDialog, setOpenAddDialog] = useState(false);
@@ -112,6 +115,12 @@ export const TestsTable: React.FC<TestsTableProps> = ({
     }
     setStatusMenuAnchor(null);
     setSelectedTest(null);
+  };
+
+  const handleDeleteTest = (testId: string) => {
+    if (onDeleteTest && confirm('Êtes-vous sûr de vouloir supprimer ce test ?')) {
+      onDeleteTest(testId);
+    }
   };
 
   const getStatusColor = (status: TestItem['status']) => {
@@ -233,6 +242,15 @@ export const TestsTable: React.FC<TestsTableProps> = ({
                           title="Ajouter un commentaire"
                         >
                           <CommentIcon fontSize="small" />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleDeleteTest(test.id)}
+                          title="Supprimer le test"
+                          color="error"
+                          disabled={disabled}
+                        >
+                          <Delete fontSize="small" />
                         </IconButton>
                       </Box>
                     </TableCell>

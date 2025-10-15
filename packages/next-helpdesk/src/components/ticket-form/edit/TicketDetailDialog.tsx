@@ -285,6 +285,17 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
     }
   };
 
+  const handleDeleteTest = async (testId: string) => {
+    if (onUpdateTicket) {
+      try {
+        const updatedTests = (ticket.tests || []).filter(test => test.id !== testId);
+        await onUpdateTicket(ticket.id, { tests: updatedTests } as any);
+      } catch (error) {
+        console.error("Erreur lors de la suppression du test:", error);
+      }
+    }
+  };
+
   const canEdit = currentUser.role === "admin" || currentUser.role === "agent";
 
   const formatDate = (date: Date) => {
@@ -766,6 +777,7 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
                         currentUser={currentUser}
                         onAddTest={handleAddTest}
                         onUpdateTest={handleUpdateTest}
+                        onDeleteTest={handleDeleteTest}
                         onAddTestComment={handleAddTestComment}
                       />
                     ) : (
@@ -863,6 +875,7 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
                           currentUser={currentUser}
                           onAddTest={handleAddTest}
                           onUpdateTest={handleUpdateTest}
+                          onDeleteTest={handleDeleteTest}
                           onAddComment={handleAddTestComment}
                         />
                       </Grid>
