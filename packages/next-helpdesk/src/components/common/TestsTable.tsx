@@ -232,9 +232,6 @@ export const TestsTable: React.FC<TestsTableProps> = ({
                       {test.assignedTo ? (
                         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                           <UserAvatar user={test.assignedTo} size={24} />
-                          <Typography variant="caption">
-                            {test.assignedTo.name}
-                          </Typography>
                         </Box>
                       ) : (
                         <Typography variant="caption" color="text.secondary">
@@ -245,9 +242,6 @@ export const TestsTable: React.FC<TestsTableProps> = ({
                     <TableCell>
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                         <UserAvatar user={test.createdBy} size={24} />
-                        <Typography variant="caption">
-                          {test.createdBy.name}
-                        </Typography>
                       </Box>
                     </TableCell>
                     <TableCell>

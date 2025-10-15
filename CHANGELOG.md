@@ -5,6 +5,15 @@ Tous les changements notables de ce projet seront documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [1.6.1] - 2025-10-15
+
+### Amélioré
+- **TestsTable** : Affichage optimisé des utilisateurs dans la table des tests
+  - Affichage uniquement de l'avatar (sans le nom) dans les colonnes "Assigné à" et "Créé par"
+  - Interface plus compacte et épurée
+  - Meilleure lisibilité avec les avatars visuels
+  - Les informations sont accessibles via le tooltip de l'avatar
+
 ## [1.6.0] - 2025-10-15
 
 ### Ajouté
