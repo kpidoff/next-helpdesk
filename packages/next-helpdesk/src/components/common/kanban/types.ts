@@ -9,6 +9,13 @@ export interface TicketKanbanProps {
   onUpdateTicket?: (ticketId: string, data: Partial<UpdateTicketFormData>) => Promise<void>;
   onAddComment?: (ticketId: string, content: string, files?: File[]) => Promise<void>;
   onCloseTicket?: (ticketId: string) => Promise<void>;
+  
+  // Callbacks spécifiques pour les tests
+  onAddTest?: (ticketId: string, test: Omit<any, 'id' | 'createdAt' | 'createdBy'>) => Promise<void>;
+  onUpdateTest?: (ticketId: string, testId: string, updates: Partial<any>) => Promise<void>;
+  onDeleteTest?: (ticketId: string, testId: string) => Promise<void>;
+  onAddTestComment?: (ticketId: string, testId: string, comment: Omit<any, 'id' | 'testId' | 'createdAt' | 'createdBy'>) => Promise<void>;
+  
   title?: string;
   description?: string;
   height?: number;

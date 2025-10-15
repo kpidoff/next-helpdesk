@@ -262,6 +262,7 @@ const mockTickets: Ticket[] = [
         id: "test_1",
         url: "https://staging.example.com/test/connexion",
         status: "passed",
+        assignedTo: mockUsers[2], // Assigné à Pierre Durand (admin)
         createdAt: new Date("2025-07-15T10:00:00"),
         createdBy: mockUsers[1],
         comments: [
@@ -285,6 +286,7 @@ const mockTickets: Ticket[] = [
         id: "test_2",
         url: "https://staging.example.com/test/perf",
         status: "failed",
+        assignedTo: mockUsers[1], // Assigné à Marie Martin (agent)
         createdAt: new Date("2025-07-15T10:15:00"),
         createdBy: mockUsers[1],
         comments: [
@@ -301,6 +303,7 @@ const mockTickets: Ticket[] = [
         id: "test_3",
         url: "https://staging.example.com/test/responsive",
         status: "in_review",
+        assignedTo: undefined, // Non assigné
         createdAt: new Date("2025-07-15T11:30:00"),
         createdBy: mockUsers[1],
         comments: []
@@ -370,6 +373,7 @@ const mockTickets: Ticket[] = [
         id: "test_billing_1",
         url: "https://test.example.com/billing/refund",
         status: "pending",
+        assignedTo: mockUsers[4], // Assigné à Lucas Moreau (agent)
         createdAt: new Date("2025-07-15T08:30:00"),
         createdBy: mockUsers[1],
         comments: []
@@ -733,6 +737,109 @@ export default function Home() {
     );
 
     showAlert("Ticket clôturé avec succès !");
+  };
+
+  // Gestion des tests
+  const handleAddTest = async (ticketId: string, test: Omit<any, 'id' | 'createdAt' | 'createdBy'>) => {
+    console.log("🧪 Ajout d'un test:", ticketId, test);
+
+    const newTest: any = {
+      id: `test_${Date.now()}`,
+      url: test.url,
+      status: test.status,
+      assignedTo: test.assignedTo, // L'utilisateur assigné est déjà l'objet complet
+      createdAt: new Date(),
+      createdBy: currentUser,
+      comments: [],
+    };
+
+    setTickets((prev) =>
+      prev.map((ticket) => {
+        if (ticket.id === ticketId) {
+          return {
+            ...ticket,
+            tests: [...(ticket.tests || []), newTest],
+            updatedAt: new Date(),
+          } as any;
+        }
+        return ticket;
+      })
+    );
+
+    console.log("Test ajouté avec succès !");
+  };
+
+  const handleUpdateTest = async (ticketId: string, testId: string, updates: Partial<any>) => {
+    console.log("🔄 Mise à jour du test:", ticketId, testId, updates);
+
+    setTickets((prev) =>
+      prev.map((ticket) => {
+        if (ticket.id === ticketId) {
+          return {
+            ...ticket,
+            tests: (ticket.tests || []).map(test =>
+              test.id === testId
+                ? { ...test, ...updates, updatedAt: new Date(), updatedBy: currentUser }
+                : test
+            ),
+            updatedAt: new Date(),
+          };
+        }
+        return ticket;
+      })
+    );
+
+    console.log("Test mis à jour avec succès !");
+  };
+
+  const handleDeleteTest = async (ticketId: string, testId: string) => {
+    console.log("🗑️ Suppression du test:", ticketId, testId);
+
+    setTickets((prev) =>
+      prev.map((ticket) => {
+        if (ticket.id === ticketId) {
+          return {
+            ...ticket,
+            tests: (ticket.tests || []).filter(test => test.id !== testId),
+            updatedAt: new Date(),
+          };
+        }
+        return ticket;
+      })
+    );
+
+    console.log("Test supprimé avec succès !");
+  };
+
+  const handleAddTestComment = async (ticketId: string, testId: string, comment: Omit<any, 'id' | 'testId' | 'createdAt' | 'createdBy'>) => {
+    console.log("💬 Ajout d'un commentaire sur le test:", ticketId, testId, comment);
+
+    const newComment: any = {
+      id: `comment_${Date.now()}`,
+      testId,
+      ...comment,
+      createdAt: new Date(),
+      createdBy: currentUser,
+    };
+
+    setTickets((prev) =>
+      prev.map((ticket) => {
+        if (ticket.id === ticketId) {
+          return {
+            ...ticket,
+            tests: (ticket.tests || []).map(test =>
+              test.id === testId
+                ? { ...test, comments: [...(test.comments || []), newComment] }
+                : test
+            ),
+            updatedAt: new Date(),
+          } as any;
+        }
+        return ticket;
+      })
+    );
+
+    console.log("Commentaire de test ajouté avec succès !");
   };
 
   // Gestion de la suppression de tags
@@ -1289,6 +1396,10 @@ export default function Home() {
               onUpdateTicket={handleUpdateTicket}
               onAddComment={handleAddComment}
               onCloseTicket={handleCloseTicket}
+              onAddTest={handleAddTest}
+              onUpdateTest={handleUpdateTest}
+              onDeleteTest={handleDeleteTest}
+              onAddTestComment={handleAddTestComment}
               title="Vue Kanban des Tickets"
               height={600}
             />
@@ -1323,6 +1434,10 @@ export default function Home() {
               onUpdateTicket={handleUpdateTicket}
               onAddComment={handleAddComment}
               onCloseTicket={handleCloseTicket}
+              onAddTest={handleAddTest}
+              onUpdateTest={handleUpdateTest}
+              onDeleteTest={handleDeleteTest}
+              onAddTestComment={handleAddTestComment}
               title="Liste des Tickets (Composant indépendant)"
               loading={false}
             />

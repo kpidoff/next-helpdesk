@@ -5,6 +5,58 @@ Tous les changements notables de ce projet seront documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [1.6.0] - 2025-10-15
+
+### Ajouté
+- **Callbacks spécifiques pour les tests** : Architecture améliorée avec callbacks dédiés
+  - `onAddTest(ticketId, test)` : Callback pour l'ajout d'un nouveau test
+  - `onUpdateTest(ticketId, testId, updates)` : Callback pour la mise à jour d'un test (changement de statut, etc.)
+  - `onDeleteTest(ticketId, testId)` : Callback pour la suppression d'un test
+  - `onAddTestComment(ticketId, testId, comment)` : Callback pour l'ajout d'un commentaire sur un test
+  - Ces callbacks donnent un contrôle granulaire sur chaque opération
+  - Permettent de savoir exactement quelle action est effectuée
+  
+- **Assignation d'utilisateurs aux tests** : Nouveau champ pour assigner des agents/admins aux tests
+  - Ajout du champ `assignedTo` dans l'interface `TestItem`
+  - Sélecteur d'utilisateur dans le dialog de création de test
+  - Filtre automatique pour afficher uniquement les agents et admins
+  - Nouvelle colonne "Assigné à" dans la table des tests
+  - Affichage de l'avatar et du nom de l'utilisateur assigné
+  - Affichage "Non assigné" si aucun utilisateur n'est sélectionné
+
+- **Affichage conditionnel de la section tests** : La section tests s'affiche uniquement si au moins un callback de test est fourni
+  - Si aucun callback de test n'est fourni, la section TestsTable n'apparaît pas
+  - Permet de désactiver complètement la fonctionnalité des tests si non utilisée
+  - Optimisation des performances en n'affichant que les fonctionnalités activées
+
+### Amélioré
+- **Dialog de création de test** : Amélioration visuelle avec séparateurs
+  - Utilisation de la prop `dividers` sur `DialogContent` pour des séparateurs automatiques
+  - Meilleure séparation visuelle entre le titre, le contenu et les actions
+  - Interface plus claire et professionnelle
+
+- **Architecture des callbacks** : Migration vers des callbacks spécifiques
+  - Remplacement de la logique interne de manipulation du tableau de tests
+  - Les composants appellent maintenant directement les callbacks fournis
+  - Plus de flexibilité pour l'implémentation côté utilisateur
+  - Permet d'ajouter de la logique métier personnalisée (validation, permissions, logging, etc.)
+
+### Technique
+- Ajout des nouveaux callbacks dans `TicketDetailDialog`, `TicketList` et `TicketKanban`
+- Filtrage des utilisateurs par rôle (agents et admins uniquement) pour l'assignation
+- Utilisation de `useHelpdesk()` dans `TestsTable` pour accéder à la liste des utilisateurs
+- Export des nouveaux types via les fichiers d'index
+- Compatibilité maintenue avec l'ancien système (callbacks optionnels)
+
+### Breaking Changes
+⚠️ **Important** : Cette version introduit une nouvelle architecture pour la gestion des tests.
+
+**Migration recommandée :**
+- Ancien système : Tout passait par `onUpdateTicket` avec `{ tests: updatedTests }`
+- Nouveau système : Callbacks spécifiques `onAddTest`, `onUpdateTest`, `onDeleteTest`, `onAddTestComment`
+
+**Les deux systèmes sont compatibles** : Si vous ne fournissez pas les nouveaux callbacks, la section tests ne s'affichera simplement pas. Aucune erreur ne sera générée.
+
 ## [1.5.2] - 2025-10-15
 
 ### Documentation

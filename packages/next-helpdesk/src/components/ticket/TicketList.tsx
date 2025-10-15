@@ -64,6 +64,13 @@ interface TicketListProps {
     files?: File[]
   ) => Promise<void>;
   onCloseTicket?: (ticketId: string) => Promise<void>;
+  
+  // Callbacks spécifiques pour les tests
+  onAddTest?: (ticketId: string, test: Omit<any, 'id' | 'createdAt' | 'createdBy'>) => Promise<void>;
+  onUpdateTest?: (ticketId: string, testId: string, updates: Partial<any>) => Promise<void>;
+  onDeleteTest?: (ticketId: string, testId: string) => Promise<void>;
+  onAddTestComment?: (ticketId: string, testId: string, comment: Omit<any, 'id' | 'testId' | 'createdAt' | 'createdBy'>) => Promise<void>;
+  
   loading?: boolean;
   title?: string;
 }
@@ -78,6 +85,10 @@ export const TicketList: React.FC<TicketListProps> = ({
   onUpdateTicket,
   onAddComment,
   onCloseTicket,
+  onAddTest,
+  onUpdateTest,
+  onDeleteTest,
+  onAddTestComment,
   loading = false,
   title = "Liste des Tickets",
 }) => {
@@ -533,6 +544,10 @@ export const TicketList: React.FC<TicketListProps> = ({
           onUpdateTicket={handleUpdateTicket}
           onAddComment={handleAddComment}
           onCloseTicket={onCloseTicket}
+          onAddTest={onAddTest}
+          onUpdateTest={onUpdateTest}
+          onDeleteTest={onDeleteTest}
+          onAddTestComment={onAddTestComment}
           loading={dialogLoading}
           mode={dialogMode}
         />

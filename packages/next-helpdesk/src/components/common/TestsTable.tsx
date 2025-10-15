@@ -39,6 +39,8 @@ import React, { useState } from "react";
 import { TestComment, TestItem, User } from "../../types";
 
 import { UserAvatar } from "./UserAvatar";
+import { UserSelect } from "./UserSelect";
+import { useHelpdesk } from "../../context/HelpdeskContext";
 
 interface TestsTableProps {
   tests?: TestItem[];
@@ -52,6 +54,7 @@ interface TestsTableProps {
 
 interface TestFormData {
   url: string;
+  assignedTo?: string;
 }
 
 interface CommentFormData {
@@ -68,14 +71,18 @@ export const TestsTable: React.FC<TestsTableProps> = ({
   onDeleteTest,
   onAddComment,
 }) => {
+  const { users } = useHelpdesk();
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [openCommentDialog, setOpenCommentDialog] = useState(false);
   const [statusMenuAnchor, setStatusMenuAnchor] = useState<null | HTMLElement>(null);
   const [selectedTestId, setSelectedTestId] = useState<string>("");
   const [selectedTest, setSelectedTest] = useState<TestItem | null>(null);
 
+  // Filtrer uniquement les agents et admins
+  const agentsAndAdmins = users.filter(user => user.role === 'agent' || user.role === 'admin');
+
   const { control: testControl, handleSubmit: handleTestSubmit, reset: resetTest } = useForm<TestFormData>({
-    defaultValues: { url: "" }
+    defaultValues: { url: "", assignedTo: "" }
   });
 
   const { control: commentControl, handleSubmit: handleCommentSubmit, reset: resetComment } = useForm<CommentFormData>({
@@ -85,9 +92,14 @@ export const TestsTable: React.FC<TestsTableProps> = ({
 
   const handleAddTest = (data: TestFormData) => {
     if (onAddTest) {
+      const assignedUser = data.assignedTo 
+        ? users.find(u => u.id === data.assignedTo)
+        : undefined;
+      
       onAddTest({
         url: data.url,
         status: 'pending',
+        assignedTo: assignedUser,
         comments: []
       });
     }
@@ -180,6 +192,7 @@ export const TestsTable: React.FC<TestsTableProps> = ({
               <TableRow>
                 <TableCell>URL du test</TableCell>
                 <TableCell>Statut</TableCell>
+                <TableCell>Assigné à</TableCell>
                 <TableCell>Créé par</TableCell>
                 <TableCell>Date</TableCell>
                 <TableCell>Actions</TableCell>
@@ -214,6 +227,20 @@ export const TestsTable: React.FC<TestsTableProps> = ({
                           transition: 'all 0.2s'
                         }}
                       />
+                    </TableCell>
+                    <TableCell>
+                      {test.assignedTo ? (
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                          <UserAvatar user={test.assignedTo} size={24} />
+                          <Typography variant="caption">
+                            {test.assignedTo.name}
+                          </Typography>
+                        </Box>
+                      ) : (
+                        <Typography variant="caption" color="text.secondary">
+                          Non assigné
+                        </Typography>
+                      )}
                     </TableCell>
                     <TableCell>
                       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -266,7 +293,7 @@ export const TestsTable: React.FC<TestsTableProps> = ({
                   {/* Affichage des commentaires */}
                   {test.comments && test.comments.length > 0 && (
                     <TableRow>
-                      <TableCell colSpan={5} sx={{ p: 0, borderBottom: 'none' }}>
+                      <TableCell colSpan={6} sx={{ p: 0, borderBottom: 'none' }}>
                         <Accordion variant="outlined" sx={{ boxShadow: 'none', border: 'none', '&:before': { display: 'none' } }}>
                           <AccordionSummary 
                             expandIcon={<ExpandMore />}
@@ -318,7 +345,7 @@ export const TestsTable: React.FC<TestsTableProps> = ({
       <Dialog open={openAddDialog} onClose={() => setOpenAddDialog(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Ajouter un nouveau test</DialogTitle>
         <form onSubmit={handleTestSubmit(handleAddTest)}>
-          <DialogContent>
+          <DialogContent dividers>
             <Box sx={{ mt: 2 }}>
               <Controller
                 name="url"
@@ -343,6 +370,17 @@ export const TestsTable: React.FC<TestsTableProps> = ({
                 )}
               />
             </Box>
+            {agentsAndAdmins.length > 0 && (
+              <Box sx={{ mt: 2 }}>
+                <UserSelect
+                  name="assignedTo"
+                  control={testControl}
+                  users={agentsAndAdmins}
+                  label="Assigner à"
+                  placeholder="Sélectionner un agent ou admin..."
+                />
+              </Box>
+            )}
           </DialogContent>
           <DialogActions>
             <Button onClick={() => setOpenAddDialog(false)}>

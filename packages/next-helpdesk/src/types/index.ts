@@ -37,6 +37,7 @@ export interface TestItem {
   id: string;
   url: string;
   status: 'pending' | 'passed' | 'failed' | 'in_review';
+  assignedTo?: Omit<User, 'role'>;
   createdAt: Date;
   createdBy: Omit<User, 'role'>;
   updatedAt?: Date;

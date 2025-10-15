@@ -73,6 +73,13 @@ interface TicketDetailDialogProps {
     files?: File[]
   ) => Promise<void>;
   onCloseTicket?: (ticketId: string) => Promise<void>;
+  
+  // Callbacks spécifiques pour les tests
+  onAddTest?: (ticketId: string, test: Omit<any, 'id' | 'createdAt' | 'createdBy'>) => Promise<void>;
+  onUpdateTest?: (ticketId: string, testId: string, updates: Partial<any>) => Promise<void>;
+  onDeleteTest?: (ticketId: string, testId: string) => Promise<void>;
+  onAddTestComment?: (ticketId: string, testId: string, comment: Omit<any, 'id' | 'testId' | 'createdAt' | 'createdBy'>) => Promise<void>;
+  
   loading?: boolean;
   mode?: "view" | "edit";
 }
@@ -84,6 +91,10 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
   onUpdateTicket,
   onAddComment,
   onCloseTicket,
+  onAddTest,
+  onUpdateTest,
+  onDeleteTest,
+  onAddTestComment,
   loading = false,
   mode = "view",
 }) => {
@@ -231,17 +242,9 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
   };
 
   const handleAddTest = async (test: Omit<any, 'id' | 'createdAt' | 'createdBy'>) => {
-    if (onUpdateTicket) {
+    if (onAddTest) {
       try {
-        const newTest = {
-          id: `test_${Date.now()}`,
-          ...test,
-          createdAt: new Date(),
-          createdBy: currentUser,
-        };
-        
-        const updatedTests = [...(ticket.tests || []), newTest];
-        await onUpdateTicket(ticket.id, { tests: updatedTests } as any);
+        await onAddTest(ticket.id, test);
       } catch (error) {
         console.error("Erreur lors de l'ajout du test:", error);
       }
@@ -249,12 +252,9 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
   };
 
   const handleUpdateTest = async (testId: string, updates: Partial<any>) => {
-    if (onUpdateTicket) {
+    if (onUpdateTest) {
       try {
-        const updatedTests = (ticket.tests || []).map(test => 
-          test.id === testId ? { ...test, ...updates, updatedAt: new Date(), updatedBy: currentUser } : test
-        );
-        await onUpdateTicket(ticket.id, { tests: updatedTests } as any);
+        await onUpdateTest(ticket.id, testId, updates);
       } catch (error) {
         console.error("Erreur lors de la mise à jour du test:", error);
       }
@@ -262,23 +262,9 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
   };
 
   const handleAddTestComment = async (testId: string, comment: Omit<any, 'id' | 'testId' | 'createdAt' | 'createdBy'>) => {
-    if (onUpdateTicket) {
+    if (onAddTestComment) {
       try {
-        const newComment = {
-          id: `comment_${Date.now()}`,
-          testId,
-          ...comment,
-          createdAt: new Date(),
-          createdBy: currentUser,
-        };
-
-        const updatedTests = (ticket.tests || []).map(test => 
-          test.id === testId 
-            ? { ...test, comments: [...(test.comments || []), newComment] }
-            : test
-        );
-        
-        await onUpdateTicket(ticket.id, { tests: updatedTests } as any);
+        await onAddTestComment(ticket.id, testId, comment);
       } catch (error) {
         console.error("Erreur lors de l'ajout du commentaire de test:", error);
       }
@@ -286,10 +272,9 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
   };
 
   const handleDeleteTest = async (testId: string) => {
-    if (onUpdateTicket) {
+    if (onDeleteTest) {
       try {
-        const updatedTests = (ticket.tests || []).filter(test => test.id !== testId);
-        await onUpdateTicket(ticket.id, { tests: updatedTests } as any);
+        await onDeleteTest(ticket.id, testId);
       } catch (error) {
         console.error("Erreur lors de la suppression du test:", error);
       }
@@ -773,12 +758,12 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
                         category={ticket.category}
                         currentStatus={watch("status")}
                         onStatusChange={handleStatusChangeFromTracking}
-                        tests={ticket.tests}
+                        tests={onAddTest || onUpdateTest || onDeleteTest || onAddTestComment ? ticket.tests : undefined}
                         currentUser={currentUser}
-                        onAddTest={handleAddTest}
-                        onUpdateTest={handleUpdateTest}
-                        onDeleteTest={handleDeleteTest}
-                        onAddTestComment={handleAddTestComment}
+                        onAddTest={onAddTest ? handleAddTest : undefined}
+                        onUpdateTest={onUpdateTest ? handleUpdateTest : undefined}
+                        onDeleteTest={onDeleteTest ? handleDeleteTest : undefined}
+                        onAddTestComment={onAddTestComment ? handleAddTestComment : undefined}
                       />
                     ) : (
                       <Box>
@@ -868,17 +853,19 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
                           {ticket.branchName || "Non défini"}
                         </Typography>
                       </Grid>
-                      <Grid item xs={12} sx={{ mt: 2 }}>
-                        <TestsTable
-                          tests={ticket.tests}
-                          disabled={true}
-                          currentUser={currentUser}
-                          onAddTest={handleAddTest}
-                          onUpdateTest={handleUpdateTest}
-                          onDeleteTest={handleDeleteTest}
-                          onAddComment={handleAddTestComment}
-                        />
-                      </Grid>
+                      {(onAddTest || onUpdateTest || onDeleteTest || onAddTestComment) && (
+                        <Grid item xs={12} sx={{ mt: 2 }}>
+                          <TestsTable
+                            tests={ticket.tests}
+                            disabled={true}
+                            currentUser={currentUser}
+                            onAddTest={onAddTest ? handleAddTest : undefined}
+                            onUpdateTest={onUpdateTest ? handleUpdateTest : undefined}
+                            onDeleteTest={onDeleteTest ? handleDeleteTest : undefined}
+                            onAddComment={onAddTestComment ? handleAddTestComment : undefined}
+                          />
+                        </Grid>
+                      )}
                     </Grid>
                   )}
                 </AccordionDetails>

@@ -17,6 +17,10 @@ export const TicketKanban: React.FC<TicketKanbanProps> = ({
   onUpdateTicket,
   onAddComment,
   onCloseTicket,
+  onAddTest,
+  onUpdateTest,
+  onDeleteTest,
+  onAddTestComment,
   title,
   description,
   height = 600,
@@ -167,6 +171,10 @@ export const TicketKanban: React.FC<TicketKanbanProps> = ({
           onUpdateTicket={onUpdateTicket}
           onAddComment={onAddComment}
           onCloseTicket={onCloseTicket}
+          onAddTest={onAddTest}
+          onUpdateTest={onUpdateTest}
+          onDeleteTest={onDeleteTest}
+          onAddTestComment={onAddTestComment}
           mode="view"
         />
       )}

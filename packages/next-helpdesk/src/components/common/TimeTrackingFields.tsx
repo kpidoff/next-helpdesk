@@ -356,15 +356,17 @@ export const TimeTrackingFields: React.FC<TimeTrackingFieldsProps> = ({
         />
       </Box>
 
-      <TestsTable
-        tests={tests}
-        disabled={disabled}
-        currentUser={currentUser}
-        onAddTest={onAddTest}
-        onUpdateTest={onUpdateTest}
-        onDeleteTest={onDeleteTest}
-        onAddComment={onAddTestComment}
-      />
+      {(onAddTest || onUpdateTest || onDeleteTest || onAddTestComment) && tests && (
+        <TestsTable
+          tests={tests}
+          disabled={disabled}
+          currentUser={currentUser}
+          onAddTest={onAddTest}
+          onUpdateTest={onUpdateTest}
+          onDeleteTest={onDeleteTest}
+          onAddComment={onAddTestComment}
+        />
+      )}
 
     </Box>
   );
