@@ -157,14 +157,16 @@ export const TestsTable: React.FC<TestsTableProps> = ({
     <Box>
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
         <Typography variant="h6">Tests ({tests.length})</Typography>
-        <Button
-          variant="contained"
-          startIcon={<Add />}
-          onClick={() => setOpenAddDialog(true)}
-          size="small"
-        >
-          Ajouter un test
-        </Button>
+        {!disabled && (
+          <Button
+            variant="contained"
+            startIcon={<Add />}
+            onClick={() => setOpenAddDialog(true)}
+            size="small"
+          >
+            Ajouter un test
+          </Button>
+        )}
       </Box>
 
       {tests.length === 0 ? (
@@ -197,16 +199,18 @@ export const TestsTable: React.FC<TestsTableProps> = ({
                         label={getStatusLabel(test.status)}
                         color={getStatusColor(test.status)}
                         size="small"
-                        onClick={(e) => {
+                        onClick={!disabled ? (e) => {
                           setSelectedTest(test);
                           setStatusMenuAnchor(e.currentTarget);
-                        }}
+                        } : undefined}
                         sx={{ 
-                          cursor: 'pointer',
-                          '&:hover': { 
-                            opacity: 0.8,
-                            transform: 'scale(1.05)',
-                          },
+                          cursor: disabled ? 'default' : 'pointer',
+                          ...(!disabled && {
+                            '&:hover': { 
+                              opacity: 0.8,
+                              transform: 'scale(1.05)',
+                            },
+                          }),
                           transition: 'all 0.2s'
                         }}
                       />
@@ -233,25 +237,28 @@ export const TestsTable: React.FC<TestsTableProps> = ({
                         >
                           <Launch fontSize="small" />
                         </IconButton>
-                        <IconButton
-                          size="small"
-                          onClick={() => {
-                            setSelectedTestId(test.id);
-                            setOpenCommentDialog(true);
-                          }}
-                          title="Ajouter un commentaire"
-                        >
-                          <CommentIcon fontSize="small" />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          onClick={() => handleDeleteTest(test.id)}
-                          title="Supprimer le test"
-                          color="error"
-                          disabled={disabled}
-                        >
-                          <Delete fontSize="small" />
-                        </IconButton>
+                        {!disabled && (
+                          <>
+                            <IconButton
+                              size="small"
+                              onClick={() => {
+                                setSelectedTestId(test.id);
+                                setOpenCommentDialog(true);
+                              }}
+                              title="Ajouter un commentaire"
+                            >
+                              <CommentIcon fontSize="small" />
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleDeleteTest(test.id)}
+                              title="Supprimer le test"
+                              color="error"
+                            >
+                              <Delete fontSize="small" />
+                            </IconButton>
+                          </>
+                        )}
                       </Box>
                     </TableCell>
                   </TableRow>

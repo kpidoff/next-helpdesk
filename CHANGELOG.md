@@ -5,6 +5,139 @@ Tous les changements notables de ce projet seront documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Semantic Versioning](https://semver.org/lang/fr/).
 
+## [1.5.2] - 2025-10-15
+
+### Documentation
+- **CHANGELOG** : Ajout de la documentation complète pour la version 1.4.0
+  - Documentation détaillée du système de suivi du temps
+  - Documentation du composant TestsTable et de ses fonctionnalités
+  - Documentation du système d'alertes anti-doublons
+  - Section Architecture expliquant l'API simplifiée
+
+- **README** : Ajout d'une section "Architecture & API"
+  - Explication détaillée du principe de l'API simplifiée avec un seul callback
+  - Exemples de code montrant comment les opérations internes fonctionnent
+  - Documentation des avantages de cette approche (API simple, pas de breaking changes, flexibilité, encapsulation)
+  - Exemple complet d'implémentation avec Prisma
+  - Ajout d'une section "Nouvelles fonctionnalités (v1.4.0+)" dans les features
+  - Documentation du suivi du temps et de la gestion des tests
+
+## [1.5.1] - 2025-10-15
+
+### Corrigé
+- **TestsTable** : Correction du mode édition/visualisation pour les tests
+  - Le bouton "Ajouter un test" est maintenant visible uniquement en mode édition
+  - Les boutons "Ajouter un commentaire" et "Supprimer le test" sont masqués en mode visualisation
+  - Le chip de statut n'est plus cliquable en mode visualisation (pas d'effet hover, curseur normal)
+  - Le bouton "Ouvrir le test" reste visible en mode visualisation pour consultation
+  - Meilleure distinction visuelle entre les modes édition et visualisation
+
+### Technique
+- Utilisation de la prop `disabled` pour contrôler l'affichage des actions
+- Gestion conditionnelle du onClick et des styles du chip de statut
+
+## [1.5.0] - 2025-10-15
+
+### Ajouté
+- **Champ "Nom de la branche"** : Nouveau champ de texte libre dans la section Administrateur
+  - Ajout du champ `branchName` dans l'interface `Ticket` et le schéma de validation
+  - Champ positionné juste au-dessus de la liste des tests
+  - Affichage en mode édition (TextField) et visualisation (texte simple)
+  - Placeholder et helper text pour guider l'utilisateur (ex: "feature/ticket-123")
+  - Validation : maximum 100 caractères
+
+- **Suppression des tests** : Nouvelle fonctionnalité de gestion des tests
+  - Ajout d'un bouton rouge avec icône de suppression pour chaque test
+  - Confirmation avant suppression avec dialog natif
+  - Nouvelle prop `onDeleteTest` dans `TestsTable` et `TimeTrackingFields`
+  - Fonction `handleDeleteTest` dans `TicketDetailDialog` qui filtre le tableau des tests
+  - Bouton désactivé en mode `disabled`
+
+### Amélioré
+- **Interface utilisateur des statuts** : Remplacement des popups par des menus déroulants
+  - **TimeTrackingFields** : Le dialog de changement de statut lors de la saisie du temps passé a été remplacé par un `Collapse` avec menu déroulant inline
+    - Apparence plus moderne avec fond bleu clair et bordure
+    - Animation fluide avec `Collapse` (timeout 300ms)
+    - Changement immédiat du statut lors de la sélection
+  - **TestsTable** : Le dialog de changement de statut des tests a été remplacé par un `Menu` contextuel
+    - S'ouvre au clic sur le chip de statut
+    - Menu déroulant positionné à côté du chip
+    - Liste des statuts avec emojis (⏳ En attente, 👁 En cours, ✓ Validé, ✗ Échoué)
+
+- **Système anti-doublons pour les alertes**
+  - Implémentation d'un système de debounce avec `useRef`
+  - Les alertes identiques ne s'affichent pas si elles sont déclenchées dans un intervalle de 1 seconde
+  - Résolution du problème d'alertes en double lors de l'ajout de commentaires sur les tests
+  - Fonction `showAlert` réutilisable pour toutes les alertes de l'application
+
+- **Améliorations visuelles des commentaires de tests**
+  - Utilisation de `Stack` avec espacement approprié entre l'avatar et le nom de l'utilisateur
+  - Augmentation de l'espace entre l'en-tête du commentaire et son contenu (mb: 2)
+  - Meilleure lisibilité et cohérence visuelle
+
+### Technique
+- Suppression des imports `Dialog`, `DialogTitle`, `DialogContent`, `DialogActions` et `Button` non utilisés dans `TimeTrackingFields`
+- Ajout de l'import `Collapse` dans `TimeTrackingFields`
+- Ajout de l'import `Menu` dans `TestsTable`
+- Ajout de l'import `Delete` dans `TestsTable`
+- Optimisation des re-renders avec gestion d'état améliorée
+- Code plus maintenable avec moins de popups modaux
+
+## [1.4.0] - 2025-10-15
+
+### Ajouté
+- **Système de suivi du temps (Time Tracking)** : Nouveaux champs pour gérer le temps et la planification
+  - `estimatedHours` : Temps estimé pour compléter le ticket (en heures)
+  - `hoursSpent` : Temps réellement passé sur le ticket (en heures)
+  - `startDate` : Date et heure de début du travail sur le ticket
+  - `endDate` : Date et heure de fin du travail (calculée automatiquement)
+  - Calcul automatique de l'écart entre temps estimé et temps passé
+  - Indicateurs visuels : rouge pour dépassement, vert pour en avance
+  - Proposition de changement de statut lors de la saisie du temps passé
+
+- **Composant TestsTable** : Gestion complète des tests pour les tickets
+  - Ajout de tests avec URL, statut et commentaires
+  - Suivi de la progression des tests (⏳ En attente, 👁 En cours, ✓ Validé, ✗ Échoué)
+  - Système de commentaires pour chaque test
+  - Affichage de l'auteur et de la date de création
+  - Accordéon pour afficher/masquer les commentaires
+  - Bouton pour ouvrir directement les URL de test
+  - Support complet des tests dans l'interface Ticket
+
+- **Composant TimeTrackingFields** : Interface complète pour le suivi du temps
+  - Champs de date de début et de fin avec sélecteur datetime-local
+  - Calcul automatique de la date de fin basé sur le temps passé
+  - Affichage de l'écart temps estimé vs temps passé
+  - Messages informatifs sur le calcul automatique
+  - Interface responsive avec grille Material-UI
+
+### Amélioré  
+- **Système d'alertes** : Prévention des notifications redondantes
+  - Les alertes identiques ne s'affichent plus plusieurs fois
+  - Amélioration de l'expérience utilisateur
+  - Réduction de la pollution visuelle
+
+- **TicketDetailDialog** : Intégration complète des nouveaux composants
+  - Section "Administrateur" avec TimeTrackingFields
+  - Affichage des informations de suivi du temps en mode visualisation
+  - Gestion des tests avec TestsTable intégré
+  - Handlers pour ajouter, mettre à jour et commenter les tests
+
+### Technique
+- Extension du schéma `updateTicketSchema` avec les nouveaux champs
+- Ajout des types `TestItem` et `TestComment` dans les types
+- Export des nouveaux composants dans l'index principal
+- +968 lignes de code ajoutées pour ces fonctionnalités
+- Compatibilité avec Prisma et autres ORM
+
+### Architecture
+- **API simplifiée** : Aucun nouveau callback requis pour gérer les tests
+  - Toutes les opérations de tests (ajout, modification, suppression, commentaires) passent par le callback `onUpdateTicket` existant
+  - Le composant `TicketDetailDialog` gère en interne la logique de manipulation du tableau de tests
+  - L'utilisateur du package reçoit simplement le tableau de tests mis à jour via `onUpdateTicket(ticketId, { tests: updatedTests })`
+  - **Aucune breaking change** : Le code existant continue de fonctionner sans modification
+  - Encapsulation complète de la logique métier des tests dans les composants
+
 ## [1.3.5] - 2024-12-19
 
 ### Corrigé

@@ -4,6 +4,7 @@ Une application de helpdesk moderne et complète construite avec Next.js 14 et M
 
 ## 🌟 Fonctionnalités
 
+### Core Features
 - Interface utilisateur moderne et responsive
 - Gestion complète des tickets de support
 - **Système de rôles et permissions** (Utilisateur, Agent, Administrateur)
@@ -16,7 +17,6 @@ Une application de helpdesk moderne et complète construite avec Next.js 14 et M
 - **Configuration dynamique** des catégories, statuts et priorités
 - **Système de commentaires** avec pièces jointes
 - **Gestion des assignations** de tickets
-- **Suivi du temps** (heures passées, dates de début/fin)
 - Tableau de bord administrateur
 - Notifications en temps réel
 - Support des pièces jointes
@@ -24,6 +24,29 @@ Une application de helpdesk moderne et complète construite avec Next.js 14 et M
 - Thème personnalisable via Material-UI
 - Support TypeScript complet
 - Optimisé pour les performances
+
+### 🆕 Nouvelles fonctionnalités (v1.4.0+)
+
+#### Suivi du temps (Time Tracking)
+- ⏱️ **Temps estimé et temps passé** : Suivez le temps de travail sur chaque ticket
+- 📅 **Dates de début et fin** : Planifiez et suivez les délais
+- 📊 **Calcul automatique de l'écart** : Indicateurs visuels pour les dépassements/avances
+- 🔄 **Proposition de changement de statut** : Menu déroulant automatique lors de la saisie du temps
+- 🎨 **Interface moderne** : Menu déroulant au lieu de popup pour une meilleure UX
+
+#### Gestion des tests
+- 🔗 **TestsTable** : Ajoutez des liens de test à vos tickets
+- 🎯 **4 statuts de test** : ⏳ En attente, 👁 En cours, ✓ Validé, ✗ Échoué
+- 💬 **Commentaires sur les tests** : Ajoutez des retours et observations
+- 🗑️ **Suppression des tests** : Gérez votre liste de tests (avec confirmation)
+- 🔒 **Mode édition/visualisation** : Les actions sont masquées en mode consultation
+- 📱 **Interface responsive** : Accordéon pour les commentaires, tableau optimisé
+
+#### Autres améliorations
+- 🌿 **Champ "Nom de la branche"** : Liez vos tickets à vos branches Git
+- 🚫 **Alertes anti-doublons** : Système de debounce pour éviter les notifications redondantes
+- 🎨 **Menus déroulants** : Remplacement des popups par des menus contextuels
+- 💅 **Améliorations visuelles** : Meilleur espacement, animations fluides
 
 ## 📦 Installation
 
@@ -697,6 +720,125 @@ pnpm dev
 ```bash
 # Dans le dossier apps/helpdesk-app
 pnpm dev
+```
+
+## 🏗️ Architecture & API
+
+### API Simplifiée des Callbacks
+
+Une des forces de Next-Helpdesk est son **API simplifiée** : vous n'avez besoin que d'**un seul callback** pour gérer toutes les opérations sur les tickets.
+
+#### Principe de conception
+
+Toutes les opérations (modification de statut, ajout de tests, suppression de tests, ajout de commentaires sur les tests, etc.) passent par le callback unique `onUpdateTicket` :
+
+```tsx
+const handleUpdateTicket = async (
+  ticketId: string, 
+  data: Partial<UpdateTicketFormData>
+) => {
+  // Sauvegarder en base de données
+  await prisma.ticket.update({
+    where: { id: ticketId },
+    data: data
+  });
+  
+  // Ou appeler votre API
+  await fetch(`/api/tickets/${ticketId}`, {
+    method: 'PATCH',
+    body: JSON.stringify(data)
+  });
+};
+```
+
+#### Opérations gérées automatiquement
+
+Le composant `TicketDetailDialog` gère en interne toute la logique métier et vous envoie simplement les données mises à jour :
+
+**Ajout d'un test :**
+```typescript
+// En interne, le composant fait :
+const newTest = { id: '...', url: '...', status: 'pending', ... };
+const updatedTests = [...ticket.tests, newTest];
+await onUpdateTicket(ticketId, { tests: updatedTests });
+```
+
+**Modification du statut d'un test :**
+```typescript
+// En interne, le composant fait :
+const updatedTests = ticket.tests.map(test => 
+  test.id === testId ? { ...test, status: newStatus } : test
+);
+await onUpdateTicket(ticketId, { tests: updatedTests });
+```
+
+**Suppression d'un test :**
+```typescript
+// En interne, le composant fait :
+const updatedTests = ticket.tests.filter(test => test.id !== testId);
+await onUpdateTicket(ticketId, { tests: updatedTests });
+```
+
+**Ajout d'un commentaire sur un test :**
+```typescript
+// En interne, le composant fait :
+const updatedTests = ticket.tests.map(test => 
+  test.id === testId 
+    ? { ...test, comments: [...test.comments, newComment] }
+    : test
+);
+await onUpdateTicket(ticketId, { tests: updatedTests });
+```
+
+#### Avantages de cette approche
+
+✅ **API simple** : Un seul callback à implémenter  
+✅ **Pas de breaking changes** : Votre code existant continue de fonctionner  
+✅ **Flexibilité** : Vous choisissez comment sauvegarder (Prisma, API REST, GraphQL, localStorage...)  
+✅ **Encapsulation** : La logique métier est cachée dans les composants  
+✅ **Maintenance facile** : Aucune modification nécessaire lors de l'ajout de nouvelles fonctionnalités  
+
+#### Exemple complet
+
+```tsx
+import { TicketList } from '@next-helpdesk/core';
+
+function MyApp() {
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+
+  // UN SEUL callback gère TOUT
+  const handleUpdateTicket = async (ticketId: string, data: Partial<UpdateTicketFormData>) => {
+    // Le 'data' peut contenir :
+    // - data.title, data.description, data.status, data.priority
+    // - data.branchName (nouveau champ)
+    // - data.tests (tableau complet avec tous les tests, ajouts, modifications, suppressions)
+    // - data.estimatedHours, data.hoursSpent, data.startDate, data.endDate
+    // - etc.
+    
+    // Sauvegarde en base
+    await prisma.ticket.update({
+      where: { id: ticketId },
+      data: {
+        ...data,
+        updatedAt: new Date(),
+      }
+    });
+    
+    // Mise à jour locale de l'état
+    setTickets(prev => prev.map(ticket => 
+      ticket.id === ticketId ? { ...ticket, ...data } : ticket
+    ));
+  };
+
+  return (
+    <TicketList
+      tickets={tickets}
+      onUpdateTicket={handleUpdateTicket}  // ← UN SEUL callback pour TOUT
+      onAddComment={handleAddComment}
+      onCloseTicket={handleCloseTicket}
+    />
+  );
+}
 ```
 
 ## 🎨 Personnalisation

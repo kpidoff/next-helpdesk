@@ -871,7 +871,7 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
                       <Grid item xs={12} sx={{ mt: 2 }}>
                         <TestsTable
                           tests={ticket.tests}
-                          disabled={false}
+                          disabled={true}
                           currentUser={currentUser}
                           onAddTest={handleAddTest}
                           onUpdateTest={handleUpdateTest}
