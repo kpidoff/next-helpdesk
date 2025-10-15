@@ -28,7 +28,7 @@ import {
   User,
 } from "@next-helpdesk/core";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 // Configuration personnalisée pour l'application de démonstration
 const customConfig: HelpdeskConfig = {
@@ -253,9 +253,59 @@ const mockTickets: Ticket[] = [
     createdAt: new Date("2025-07-15"),
     updatedAt: new Date("2025-07-15"),
     author: mockUsers[0],
+    estimatedHours: 3.0,
     hoursSpent: 2.5,
     startDate: new Date("2025-07-15T09:00:00"),
     endDate: new Date("2025-07-15T11:30:00"),
+    tests: [
+      {
+        id: "test_1",
+        url: "https://staging.example.com/test/connexion",
+        status: "passed",
+        createdAt: new Date("2025-07-15T10:00:00"),
+        createdBy: mockUsers[1],
+        comments: [
+          {
+            id: "comment_test_1",
+            testId: "test_1",
+            content: "Le test de connexion fonctionne parfaitement. Tous les scénarios ont été validés.",
+            createdAt: new Date("2025-07-15T10:30:00"),
+            createdBy: mockUsers[2],
+          },
+          {
+            id: "comment_test_2",
+            testId: "test_1",
+            content: "Confirmé également sur mobile, tout est OK !",
+            createdAt: new Date("2025-07-15T10:45:00"),
+            createdBy: mockUsers[1],
+          }
+        ]
+      },
+      {
+        id: "test_2",
+        url: "https://staging.example.com/test/perf",
+        status: "failed",
+        createdAt: new Date("2025-07-15T10:15:00"),
+        createdBy: mockUsers[1],
+        comments: [
+          {
+            id: "comment_test_3",
+            testId: "test_2",
+            content: "La page met plus de 3 secondes à charger. Il faut optimiser le chargement des ressources.",
+            createdAt: new Date("2025-07-15T11:00:00"),
+            createdBy: mockUsers[2],
+          }
+        ]
+      },
+      {
+        id: "test_3",
+        url: "https://staging.example.com/test/responsive",
+        status: "in_review",
+        createdAt: new Date("2025-07-15T11:30:00"),
+        createdBy: mockUsers[1],
+        comments: []
+      }
+    ],
     comments: [
       {
         id: "1",
@@ -311,9 +361,20 @@ const mockTickets: Ticket[] = [
     updatedAt: new Date("2025-07-15"),
     author: mockUsers[1],
     assignedTo: mockUsers[2],
+    estimatedHours: 1.5,
     hoursSpent: 1.0,
     startDate: new Date("2025-07-15T08:00:00"),
     endDate: new Date("2025-07-15T09:00:00"),
+    tests: [
+      {
+        id: "test_billing_1",
+        url: "https://test.example.com/billing/refund",
+        status: "pending",
+        createdAt: new Date("2025-07-15T08:30:00"),
+        createdBy: mockUsers[1],
+        comments: []
+      }
+    ],
     comments: [
       {
         id: "3",
@@ -353,6 +414,7 @@ const mockTickets: Ticket[] = [
     updatedAt: new Date("2025-07-14"),
     author: mockUsers[3],
     assignedTo: mockUsers[1],
+    estimatedHours: 3.5,
     hoursSpent: 4.0,
     startDate: new Date("2025-07-14T10:00:00"),
     endDate: new Date("2025-07-14T14:00:00"),
@@ -445,6 +507,7 @@ const mockTickets: Ticket[] = [
     updatedAt: new Date("2025-07-14"),
     author: mockUsers[0],
     assignedTo: mockUsers[1], // Assigné à l'agent Marie Martin
+    estimatedHours: 2.0,
     hoursSpent: 3.5,
     startDate: new Date("2025-07-14T08:00:00"),
     endDate: new Date("2025-07-14T11:30:00"),
@@ -483,6 +546,21 @@ const mockTickets: Ticket[] = [
 export default function Home() {
   const [tickets, setTickets] = useState<Ticket[]>(mockTickets);
   const [currentUser, setCurrentUser] = useState<User>(mockUsers[2]); // Admin par défaut
+  const lastAlertRef = useRef<{ message: string; timestamp: number } | null>(null);
+  
+  // Fonction pour afficher une alerte sans doublon
+  const showAlert = (message: string) => {
+    const now = Date.now();
+    if (
+      lastAlertRef.current &&
+      lastAlertRef.current.message === message &&
+      now - lastAlertRef.current.timestamp < 1000 // Éviter les doublons dans les 1000ms
+    ) {
+      return; // Ne pas afficher l'alerte si c'est un doublon récent
+    }
+    lastAlertRef.current = { message, timestamp: now };
+    alert(message);
+  };
 
   const handleViewTicket = (ticket: Ticket) => {
     console.log("🔍 Voir le ticket:", ticket);
@@ -500,7 +578,7 @@ export default function Home() {
       )
     ) {
       setTickets((prev) => prev.filter((t) => t.id !== ticket.id));
-      alert("Ticket supprimé !");
+      showAlert("Ticket supprimé !");
     }
   };
 
@@ -531,7 +609,7 @@ export default function Home() {
     // Ajouter le nouveau ticket à la liste
     setTickets((prev) => [newTicket, ...prev]);
 
-    alert(
+    showAlert(
       `Ticket créé avec succès !\nTitre: ${data.title}\nCatégorie: ${
         data.category
       }\nPriorité: ${data.priority}${
@@ -561,9 +639,12 @@ export default function Home() {
       const assignedUser = mockUsers.find((u) => u.id === data.assignedTo);
       updateData.assignedTo = assignedUser;
     }
+    if (data.estimatedHours !== undefined) updateData.estimatedHours = data.estimatedHours;
     if (data.hoursSpent !== undefined) updateData.hoursSpent = data.hoursSpent;
     if (data.startDate !== undefined) updateData.startDate = data.startDate;
     if (data.endDate !== undefined) updateData.endDate = data.endDate;
+    if (data.branchName !== undefined) updateData.branchName = data.branchName;
+    if ((data as any).tests !== undefined) (updateData as any).tests = (data as any).tests;
 
     setTickets((prev) =>
       prev.map((ticket) => {
@@ -574,7 +655,7 @@ export default function Home() {
       })
     );
 
-    alert("Ticket mis à jour avec succès !");
+    showAlert("Ticket mis à jour avec succès !");
   };
 
   const handleAddComment = async (
@@ -634,7 +715,7 @@ export default function Home() {
     console.log("🔒 Clôture du ticket:", ticketId);
 
     if (currentUser.role !== "admin" && currentUser.role !== "agent") {
-      alert("Vous n'avez pas les permissions pour clôturer un ticket.");
+      showAlert("Vous n'avez pas les permissions pour clôturer un ticket.");
       return;
     }
 
@@ -651,7 +732,7 @@ export default function Home() {
       })
     );
 
-    alert("Ticket clôturé avec succès !");
+    showAlert("Ticket clôturé avec succès !");
   };
 
   // Gestion de la suppression de tags

@@ -25,9 +25,31 @@ export interface Ticket {
   assignedTo?: Omit<User, 'role'>;
   comments?: Comment[];
   attachments?: Attachment[];
+  estimatedHours?: number;
   hoursSpent?: number;
   startDate?: Date;
   endDate?: Date;
+  branchName?: string;
+  tests?: TestItem[];
+}
+
+export interface TestItem {
+  id: string;
+  url: string;
+  status: 'pending' | 'passed' | 'failed' | 'in_review';
+  createdAt: Date;
+  createdBy: Omit<User, 'role'>;
+  updatedAt?: Date;
+  updatedBy?: Omit<User, 'role'>;
+  comments?: TestComment[];
+}
+
+export interface TestComment {
+  id: string;
+  testId: string;
+  content: string;
+  createdAt: Date;
+  createdBy: Omit<User, 'role'>;
 }
 
 export interface Comment {

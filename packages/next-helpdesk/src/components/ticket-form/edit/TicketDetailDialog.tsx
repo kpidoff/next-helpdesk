@@ -34,6 +34,7 @@ import {
   StatusSelect,
   TagChip,
   TagSelect,
+  TestsTable,
   TimeTrackingFields,
   UserAvatar,
   UserSelect,
@@ -113,9 +114,11 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
       assignedTo: ticket.assignedTo?.id || "",
       tags: ticket.tags || [],
       files: [],
+      estimatedHours: ticket.estimatedHours || 0,
       hoursSpent: ticket.hoursSpent || 0,
       startDate: ticket.startDate ? new Date(ticket.startDate) : undefined,
       endDate: ticket.endDate ? new Date(ticket.endDate) : undefined,
+      branchName: ticket.branchName || "",
     },
   });
 
@@ -132,9 +135,11 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
       assignedTo: ticket.assignedTo?.id || "",
       tags: ticket.tags || [],
       files: [],
+      estimatedHours: ticket.estimatedHours || 0,
       hoursSpent: ticket.hoursSpent || 0,
       startDate: ticket.startDate ? new Date(ticket.startDate) : undefined,
       endDate: ticket.endDate ? new Date(ticket.endDate) : undefined,
+      branchName: ticket.branchName || "",
     }),
     [ticket]
   );
@@ -162,6 +167,10 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
           assignedTo: data.assignedTo || ticket.assignedTo?.id || "",
           tags: data.tags || ticket.tags || [],
           files: [],
+          estimatedHours:
+            data.estimatedHours !== undefined
+              ? data.estimatedHours
+              : ticket.estimatedHours || 0,
           hoursSpent:
             data.hoursSpent !== undefined
               ? data.hoursSpent
@@ -172,6 +181,7 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
           endDate:
             data.endDate ||
             (ticket.endDate ? new Date(ticket.endDate) : undefined),
+          branchName: data.branchName || ticket.branchName || "",
         });
       } finally {
         setUpdateLoading(false);
@@ -205,6 +215,72 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
         await onCloseTicket(ticket.id);
       } finally {
         setCloseLoading(false);
+      }
+    }
+  };
+
+  const handleStatusChangeFromTracking = (newStatus: string) => {
+    // Mettre à jour le champ status dans le formulaire
+    const currentFormStatus = watch("status");
+    if (currentFormStatus !== newStatus) {
+      reset({
+        ...watch(),
+        status: newStatus,
+      });
+    }
+  };
+
+  const handleAddTest = async (test: Omit<any, 'id' | 'createdAt' | 'createdBy'>) => {
+    if (onUpdateTicket) {
+      try {
+        const newTest = {
+          id: `test_${Date.now()}`,
+          ...test,
+          createdAt: new Date(),
+          createdBy: currentUser,
+        };
+        
+        const updatedTests = [...(ticket.tests || []), newTest];
+        await onUpdateTicket(ticket.id, { tests: updatedTests } as any);
+      } catch (error) {
+        console.error("Erreur lors de l'ajout du test:", error);
+      }
+    }
+  };
+
+  const handleUpdateTest = async (testId: string, updates: Partial<any>) => {
+    if (onUpdateTicket) {
+      try {
+        const updatedTests = (ticket.tests || []).map(test => 
+          test.id === testId ? { ...test, ...updates, updatedAt: new Date(), updatedBy: currentUser } : test
+        );
+        await onUpdateTicket(ticket.id, { tests: updatedTests } as any);
+      } catch (error) {
+        console.error("Erreur lors de la mise à jour du test:", error);
+      }
+    }
+  };
+
+  const handleAddTestComment = async (testId: string, comment: Omit<any, 'id' | 'testId' | 'createdAt' | 'createdBy'>) => {
+    if (onUpdateTicket) {
+      try {
+        const newComment = {
+          id: `comment_${Date.now()}`,
+          testId,
+          ...comment,
+          createdAt: new Date(),
+          createdBy: currentUser,
+        };
+
+        const updatedTests = (ticket.tests || []).map(test => 
+          test.id === testId 
+            ? { ...test, comments: [...(test.comments || []), newComment] }
+            : test
+        );
+        
+        await onUpdateTicket(ticket.id, { tests: updatedTests } as any);
+      } catch (error) {
+        console.error("Erreur lors de l'ajout du commentaire de test:", error);
       }
     }
   };
@@ -263,25 +339,31 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
             <Grid container spacing={3} sx={{ mb: 3 }}>
               {/* Informations générales */}
               <Grid item xs={12}>
-                <Box display="flex" gap={2} alignItems="center" mb={2}>
-                  <Chip
-                    label={getStatusLabel(ticket.status, statuses)}
-                    color={getStatusColor(ticket.status, statuses)}
-                    size="small"
-                  />
-                  <Chip
-                    label={getPriorityLabel(ticket.priority, config.priorities)}
-                    color={getPriorityColor(ticket.priority, config.priorities)}
-                    size="small"
-                  />
-                  <Typography variant="caption" color="text.secondary">
-                    Créé le {formatDate(ticket.createdAt)}
-                  </Typography>
-                  {ticket.updatedAt !== ticket.createdAt && (
+                <Box display="flex" gap={2} alignItems="center" mb={2} flexWrap="wrap" justifyContent="space-between">
+                  <Box display="flex" gap={2} alignItems="center" flexWrap="wrap">
+                    <UserAvatar user={ticket.author} size={40} />
+                    <Chip
+                      label={getStatusLabel(ticket.status, statuses)}
+                      color={getStatusColor(ticket.status, statuses)}
+                      size="small"
+                    />
+                    <Chip
+                      label={getPriorityLabel(ticket.priority, config.priorities)}
+                      color={getPriorityColor(ticket.priority, config.priorities)}
+                      size="small"
+                    />
                     <Typography variant="caption" color="text.secondary">
-                      • Modifié le {formatDate(ticket.updatedAt)}
+                      • {formatDate(ticket.createdAt)}
                     </Typography>
-                  )}
+                    {ticket.updatedAt !== ticket.createdAt && (
+                      <Typography variant="caption" color="text.secondary">
+                        • Modifié le {formatDate(ticket.updatedAt)}
+                      </Typography>
+                    )}
+                  </Box>
+                  <Typography variant="h6" color="text.secondary" fontWeight="medium">
+                    #{ticket.id}
+                  </Typography>
                 </Box>
               </Grid>
 
@@ -645,12 +727,11 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
 
                     {/* Auteur */}
                     <Grid item xs={12} md={6}>
-                      <Box sx={{}}>
+                      <Box>
                         <Typography
                           variant="subtitle2"
                           color="text.secondary"
                           gutterBottom
-                          sx={{ mb: 1 }}
                         >
                           Créé par
                         </Typography>
@@ -663,11 +744,11 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
                 </AccordionDetails>
               </Accordion>
 
-              {/* Section Suivi du temps */}
+              {/* Section Administrateur */}
               <Accordion defaultExpanded={false}>
                 <AccordionSummary expandIcon={<ExpandMore />}>
                   <Typography variant="subtitle1" fontWeight="medium">
-                    Suivi du temps
+                    Administrateur
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails>
@@ -678,23 +759,24 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
                         control={control}
                         errors={errors}
                         disabled={false}
+                        category={ticket.category}
+                        currentStatus={watch("status")}
+                        onStatusChange={handleStatusChangeFromTracking}
+                        tests={ticket.tests}
+                        currentUser={currentUser}
+                        onAddTest={handleAddTest}
+                        onUpdateTest={handleUpdateTest}
+                        onAddTestComment={handleAddTestComment}
                       />
                     ) : (
                       <Box>
                         <Typography variant="body2" color="text.secondary">
-                          Seuls les agents et admins peuvent modifier le suivi
-                          du temps
+                          Seuls les agents et admins peuvent modifier ces informations
                         </Typography>
                       </Box>
                     )
                   ) : (
                     <Grid container spacing={2}>
-                      <Grid item xs={12} md={4}>
-                        <Typography variant="body2">
-                          <strong>Heures passées :</strong>{" "}
-                          {ticket.hoursSpent || 0}h
-                        </Typography>
-                      </Grid>
                       <Grid item xs={12} md={4}>
                         <Typography variant="body2">
                           <strong>Date de début :</strong>{" "}
@@ -710,6 +792,79 @@ export const TicketDetailDialog: React.FC<TicketDetailDialogProps> = ({
                             ? formatDate(ticket.endDate)
                             : "Non calculée"}
                         </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={4}>
+                        <Typography variant="body2">
+                          <strong>Temps estimé :</strong>{" "}
+                          {ticket.estimatedHours || 0}h
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        <Typography variant="body2">
+                          <strong>Temps passé :</strong>{" "}
+                          {ticket.hoursSpent || 0}h
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} md={6}>
+                        {(() => {
+                          const estimated = ticket.estimatedHours || 0;
+                          const spent = ticket.hoursSpent || 0;
+                          const difference = spent - estimated;
+                          const absValue = Math.abs(difference);
+                          
+                          let label = "±0h";
+                          let color = "success.main";
+                          let icon = "✓";
+                          let message = "Temps estimé respecté";
+                          
+                          if (difference > 0) {
+                            label = `+${difference.toFixed(1)}h`;
+                            color = "error.main";
+                            icon = "⚠️";
+                            message = "Dépassement du temps estimé";
+                          } else if (difference < 0) {
+                            label = `-${absValue.toFixed(1)}h`;
+                            color = "success.main";
+                            icon = "✓";
+                            message = "En avance sur le temps estimé";
+                          }
+                          
+                          return (
+                            <Box>
+                              <Typography variant="body2">
+                                <strong>Écart :</strong>{" "}
+                                <Typography
+                                  component="span"
+                                  sx={{ color, fontWeight: "bold" }}
+                                >
+                                  {label}
+                                </Typography>
+                              </Typography>
+                              <Typography 
+                                variant="caption" 
+                                sx={{ color, display: "block", mt: 0.5 }}
+                              >
+                                {icon} {message}
+                              </Typography>
+                            </Box>
+                          );
+                        })()}
+                      </Grid>
+                      <Grid item xs={12} sx={{ mt: 2 }}>
+                        <Typography variant="body2">
+                          <strong>Nom de la branche :</strong>{" "}
+                          {ticket.branchName || "Non défini"}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} sx={{ mt: 2 }}>
+                        <TestsTable
+                          tests={ticket.tests}
+                          disabled={false}
+                          currentUser={currentUser}
+                          onAddTest={handleAddTest}
+                          onUpdateTest={handleUpdateTest}
+                          onAddComment={handleAddTestComment}
+                        />
                       </Grid>
                     </Grid>
                   )}
